@@ -101,6 +101,8 @@ ul.exits button:focus-visible { outline: 2px solid var(--hi); }
 .lbl.off, .awayLbl.off, .vmark.off { display: none; }
 .g-room:hover .lbl.off, .g-room:focus-visible .lbl.off, .g-room.sel .lbl.off { display: inline; }
 .g-room:hover .lbl, .g-room:focus-visible .lbl { fill: var(--street); }
+.g-room:focus { outline: none; } /* the ring on the dot shows focus instead of a box */
+.g-room:focus-visible .node { stroke: var(--hi); stroke-width: 4; }
 .g-room.sel .node { stroke: var(--hi); stroke-width: 4; }
 .g-room.match .node { stroke: var(--hi); stroke-width: 3.5; }
 .g-room.sel .lbl { font-weight: 700; }
@@ -392,7 +394,8 @@ wrap.addEventListener("wheel", ev => {
 const pts = new Map(); let last = null, pinch = null, moved = 0;
 wrap.addEventListener("pointerdown", ev => {
   if (ev.target.closest("button")) return;
-  wrap.setPointerCapture(ev.pointerId); pts.set(ev.pointerId, [ev.clientX, ev.clientY]); moved = 0;
+  // No pointer capture yet: it would send the click to the map instead of the room
+  pts.set(ev.pointerId, [ev.clientX, ev.clientY]); moved = 0;
   if (pts.size === 1) { last = [ev.clientX, ev.clientY]; wrap.classList.add("drag"); }
   if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = Math.hypot(a[0] - b[0], a[1] - b[1]); }
 });
@@ -406,6 +409,7 @@ wrap.addEventListener("pointermove", ev => {
     view.x += ev.clientX - last[0]; view.y += ev.clientY - last[1]; moved += Math.abs(ev.clientX - last[0]) + Math.abs(ev.clientY - last[1]);
     last = [ev.clientX, ev.clientY]; apply();
   }
+  if (moved > 4 && !wrap.hasPointerCapture(ev.pointerId)) wrap.setPointerCapture(ev.pointerId);
 });
 const up = ev => { pts.delete(ev.pointerId); if (pts.size < 2) pinch = null; if (!pts.size) { last = null; wrap.classList.remove("drag"); } };
 wrap.addEventListener("pointerup", up); wrap.addEventListener("pointercancel", up);
