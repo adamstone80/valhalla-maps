@@ -1,0 +1,194 @@
+{
+ "d3:arena": {
+  "cast": "palace square",
+  "expected": "Palace Square",
+  "landed": "Palace Square [palace_sq@midgaard]",
+  "ok": true,
+  "walk": "w, s, w, 3n",
+  "walk_expected": "Arena entrance",
+  "walk_end": "Arena entrance [entrance@arena]",
+  "walk_ok": true
+ },
+ "d3:barbarian": {
+  "cast": "barbarian hall",
+  "expected": "Entrance to the Hall of the Barbarians",
+  "landed": "Entrance to the Hall of the Barbarians [entrance@barbarian]",
+  "ok": true
+ },
+ "d3:basemove": {
+  "cast": "azz3",
+  "expected": "azz3",
+  "landed": "azz3 [azz3@basemove]",
+  "ok": true
+ },
+ "d3:bounty": {
+  "cast": "sprees",
+  "expected": "The Smithy",
+  "landed": "The Smithy [smithy@bounty]",
+  "ok": true
+ },
+ "d3:clan_koh": {
+  "cast": "udgaard",
+  "expected": "Village Square",
+  "landed": "Village Square [square@udgaard]",
+  "ok": true,
+  "walk": "3s, e, 3n",
+  "walk_expected": "The Guard Room of the Knights of Honor",
+  "walk_end": "Village Waste Heap [dump@udgaard]",
+  "walk_ok": false
+ },
+ "d3:clericguild": {
+  "cast": "palace square",
+  "expected": "Palace Square",
+  "landed": "Palace Square [palace_sq@midgaard]",
+  "ok": true,
+  "walk": "w, s, w, n, w",
+  "walk_expected": "Monastery Gate",
+  "walk_end": "Monastery Gate [entrance@clericguild]",
+  "walk_ok": true
+ },
+ "d3:cypress": {
+  "cast": "smithy",
+  "expected": "The Blacksmith's forge",
+  "landed": "The Blacksmith's forge [smithy@cypress]",
+  "ok": true
+ },
+ "d3:druid": {
+  "cast": "druid entrance",
+  "expected": "Arched Cavern Behind the Waterfall",
+  "landed": "Arched Cavern Behind the Waterfall [entrance@druid]",
+  "ok": true
+ },
+ "d3:fightersguild": {
+  "cast": "palace square",
+  "expected": "Palace Square",
+  "landed": "Palace Square [palace_sq@midgaard]",
+  "ok": true,
+  "walk": "2n, 3w, n, e",
+  "walk_expected": "The Fighters Guild Entrance",
+  "walk_end": "The Fighters Guild Entrance [entrance@fightersguild]",
+  "walk_ok": true
+ },
+ "d3:gremlin": {
+  "cast": "house",
+  "expected": "Barnham's Farm House",
+  "landed": "Barnham's Farm House [farm_house@gremlin]",
+  "ok": true
+ },
+ "d3:halfzon": {
+  "cast": "court yard",
+  "expected": "Inn Court Yard.",
+  "landed": "Inn Court Yard. [court_yard@halfzon]",
+  "ok": true
+ },
+ "d3:haon_dor": {
+  "cast": "udgaard",
+  "expected": "Village Square",
+  "landed": "Village Square [square@udgaard]",
+  "ok": true,
+  "walk": "4w",
+  "walk_expected": "The Edge of the Forest",
+  "walk_end": "The Edge of the Forest [forest_edge@haon_dor]",
+  "walk_ok": true
+ },
+ "d3:hobgob": {
+  "cast": "hidden cave",
+  "expected": "Cave",
+  "landed": "Cave [hidden_cave@hobgob]",
+  "ok": true
+ },
+ "d3:kingc": {
+  "cast": "palace square",
+  "expected": "Palace Square",
+  "landed": "Palace Square [palace_sq@midgaard]",
+  "ok": true,
+  "walk": "open gate, s",
+  "walk_expected": "The Entrance Hall",
+  "walk_end": "The Entrance Hall [entrance_hall@kingc]",
+  "walk_ok": true
+ },
+ "d3:mageguild": {
+  "cast": "palace square",
+  "expected": "Palace Square",
+  "landed": "Palace Square [palace_sq@midgaard]",
+  "ok": true,
+  "walk": "9n, e, s",
+  "walk_expected": "Gates to the College of Arcane Arts",
+  "walk_end": "Gates to the College of Arcane Arts [entrance@mageguild]",
+  "walk_ok": true
+ },
+ "d3:midgaard": {
+  "cast": "palace square",
+  "expected": "Palace Square",
+  "landed": "Palace Square [palace_sq@midgaard]",
+  "ok": true
+ },
+ "d3:midwalls": {
+  "cast": "guard room",
+  "expected": "Basement of the South Eastern Tower",
+  "landed": "Basement of the South Eastern Tower [tower_0@midwalls]",
+  "ok": true
+ },
+ "d3:newbie": {
+  "cast": "new player council hall",
+  "expected": "New Player Council Hall",
+  "landed": "New Player Council Hall [hall@newbie]",
+  "ok": true
+ },
+ "d3:offices": {
+  "cast": "ca",
+  "expected": "Valhalla Times Main Office",
+  "landed": "Valhalla Times Main Office [vt_o@offices]",
+  "ok": true
+ },
+ "d3:paladin_guild": {
+  "cast": "palace square",
+  "expected": "Palace Square",
+  "landed": "Palace Square [palace_sq@midgaard]",
+  "ok": true,
+  "walk": "9n, w, n, w",
+  "walk_expected": "The monastery Yard",
+  "walk_end": "The monastery Yard [mon_yard@paladin_guild]",
+  "walk_ok": true
+ },
+ "d3:ranger": {
+  "cast": "chapel",
+  "expected": "A Small Wooden Chapel",
+  "landed": "A Small Wooden Chapel [chapel@ranger]",
+  "ok": true
+ },
+ "d3:ratswarf": {
+  "cast": "slave market",
+  "expected": "Slave Market",
+  "landed": "Slave Market [slave_market@ratswarf]",
+  "ok": true
+ },
+ "d3:rebirth": {
+  "cast": "glade",
+  "expected": "A Shady Green Glade in Cypress Forest",
+  "landed": "A Shady Green Glade in Cypress Forest [reb_glade@rebirth]",
+  "ok": true
+ },
+ "d3:sorcerer": {
+  "cast": "tower entrance",
+  "expected": "The Tower Entrance",
+  "landed": "The Tower Entrance [ent_tower@sorcerer]",
+  "ok": true
+ },
+ "d3:udgaard": {
+  "cast": "udgaard",
+  "expected": "Village Square",
+  "landed": "Village Square [square@udgaard]",
+  "ok": true
+ },
+ "d3:youth": {
+  "cast": "smithy",
+  "expected": "The Blacksmith's forge",
+  "landed": "The Blacksmith's forge [smithy@cypress]",
+  "ok": true,
+  "walk": "3s, d",
+  "walk_expected": "Outside Cypress Forest",
+  "walk_end": "Outside Cypress Forest [intro@youth]",
+  "walk_ok": true
+ }
+}

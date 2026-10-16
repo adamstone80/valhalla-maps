@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Valhalla World Map</title>
+<meta name="description" content="Every zone of DikuMUD II and DikuMUD III, how they connect, and where a caster can teleport in.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Alegreya+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* The same chart sheet as the Midgaard room map: header strip, the map, a ledger column for the selected zone. */
+:root {
+  --paper: #e9ecdf; --sheet: #f4f6ee; --ink: #1f2a24; --ink-soft: #56645b; --rule: #b9c2b0;
+  --d3: #2f5d4a;      /* DikuMUD III */
+  --d2: #9a5b12;      /* DikuMUD II */
+  --both: #3d4a42;    /* in both */
+  --tele: #6b3fa0;    /* teleport */
+  --hi: #d9a21b; --line: #3d4a42; --box: #fbfcf7;
+  --f-display: "IM Fell English SC", "Iowan Old Style", Georgia, serif;
+  --f-body: "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121815; --sheet: #18201c; --ink: #dfe6d8; --ink-soft: #97a597; --rule: #2e3a33;
+    --d3: #6fb497; --d2: #e3b84a; --both: #c9d3c6; --tele: #c4a0f0; --hi: #f2c14e; --line: #9fb0a4; --box: #1d2722;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121815; --sheet: #18201c; --ink: #dfe6d8; --ink-soft: #97a597; --rule: #2e3a33;
+  --d3: #6fb497; --d2: #e3b84a; --both: #c9d3c6; --tele: #c4a0f0; --hi: #f2c14e; --line: #9fb0a4; --box: #1d2722;
+  color-scheme: dark;
+}
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 15px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px;
+}
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
+h1 { font-family: var(--f-display); font-weight: 400; font-size: 1.9rem; margin: 0; letter-spacing: .02em; }
+.meta { color: var(--ink-soft); font-size: .9rem; font-variant-numeric: tabular-nums; }
+.meta a { color: var(--d3); text-underline-offset: 2px; }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-left: auto; }
+input[type=search] {
+  font: inherit; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 4px;
+  background: var(--sheet); color: var(--ink); width: 14rem; max-width: 100%;
+}
+button { font: 500 .88rem var(--f-body); padding: 6px 10px; border: 1px solid var(--rule); border-radius: 4px;
+  background: var(--sheet); color: var(--ink); cursor: pointer; }
+button:hover { border-color: var(--ink-soft); }
+:focus-visible { outline: 2px solid var(--hi); outline-offset: 2px; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; border-right: 1px solid var(--rule); }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--sheet); }
+main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 22rem; gap: 12px; }
+#wrap { position: relative; min-height: 0; min-width: 0; background: var(--sheet); border: 1px solid var(--rule);
+  border-radius: 6px; overflow: hidden; touch-action: none; cursor: grab; }
+#wrap.drag { cursor: grabbing; }
+svg { width: 100%; height: 100%; display: block; user-select: none; }
+.zoom { position: absolute; right: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 6px; }
+.zoom button { width: 34px; height: 34px; font-size: 1.1rem; padding: 0; }
+aside { min-width: 0; overflow: auto; background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; }
+aside h2 { font-family: var(--f-display); font-weight: 400; font-size: 1.45rem; margin: 0; }
+aside h3 { font: 500 .72rem var(--f-body); text-transform: uppercase; letter-spacing: .09em; color: var(--ink-soft); margin: 0 0 6px; }
+.eyebrow { font: 500 .72rem var(--f-body); text-transform: uppercase; letter-spacing: .09em; color: var(--ink-soft); }
+.id { font-family: var(--f-mono); font-size: .8rem; color: var(--ink-soft); word-break: break-all; }
+.facts { display: grid; grid-template-columns: auto minmax(0,1fr); gap: 4px 12px; margin: 0; font-size: .92rem; }
+.facts dt { color: var(--ink-soft); }
+.facts dd { margin: 0; font-variant-numeric: tabular-nums; }
+.tag { font: 500 .72rem var(--f-body); padding: 1px 6px; border-radius: 3px; border: 1px solid currentColor; white-space: nowrap; }
+.tag.d3 { color: var(--d3); } .tag.d2 { color: var(--d2); } .tag.both { color: var(--both); } .tag.soft { color: var(--ink-soft); }
+.tele { border: 1px solid var(--tele); border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.tele h3 { color: var(--tele); }
+.cmd { display: flex; gap: 6px; align-items: stretch; }
+.cmd code { flex: 1; font: 500 .86rem var(--f-mono); background: var(--paper); border-radius: 4px; padding: 6px 8px; overflow-wrap: anywhere; }
+.cmd button { padding: 4px 8px; font-size: .8rem; }
+.hint { color: var(--ink-soft); font-size: .85rem; line-height: 1.45; margin: 0; }
+.hint a { color: var(--d3); text-underline-offset: 2px; }
+ul.links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: .9rem; }
+ul.links li { line-height: 1.3; }
+.dir { font: 500 .75rem var(--f-mono); text-transform: uppercase; color: var(--ink-soft); }
+.go { all: unset; cursor: pointer; color: var(--d3); text-decoration: underline; text-underline-offset: 2px; }
+.go:focus-visible { outline: 2px solid var(--hi); }
+details summary { cursor: pointer; color: var(--ink-soft); font-size: .88rem; }
+.notes { white-space: pre-wrap; font-size: .86rem; line-height: 1.45; margin: 8px 0 0; }
+.legend { display: grid; grid-template-columns: 1.6rem minmax(0,1fr); gap: 6px 8px; align-items: center; font-size: .88rem; }
+.legend svg { width: 1.6rem; height: 1rem; }
+#results { display: flex; flex-direction: column; gap: 2px; }
+#results button { all: unset; cursor: pointer; padding: 3px 4px; border-radius: 3px; }
+#results button:hover, #results button:focus-visible { background: var(--paper); }
+
+/* map */
+.box { fill: var(--box); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.z-d3 .box { stroke: var(--d3); } .z-d2 .box { stroke: var(--d2); } .z-both .box { stroke: var(--both); stroke-width: 2.2; }
+.zone { cursor: pointer; }
+.zone:focus { outline: none; }
+.zone:focus-visible .box, .zone.sel .box { stroke: var(--hi); stroke-width: 4; }
+.zone.match .box { stroke: var(--hi); stroke-width: 3; }
+.zone.dim { opacity: .35; }
+.zt { font-family: var(--f-display); fill: var(--ink); pointer-events: none; }
+.zs { font-family: var(--f-body); fill: var(--ink-soft); pointer-events: none; }
+.zp { font-family: var(--f-mono); fill: var(--tele); pointer-events: none; }
+.zp.none { fill: var(--ink-soft); }
+.badge { font: 700 10px var(--f-mono); pointer-events: none; }
+.z-d3 .badge { fill: var(--d3); } .z-d2 .badge { fill: var(--d2); } .z-both .badge { fill: var(--both); }
+.dot { fill: var(--sheet); stroke: var(--line); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.dot.tp { fill: var(--tele); stroke: var(--tele); }
+.edge { stroke: var(--line); stroke-width: 1.4; fill: none; opacity: .75; vector-effect: non-scaling-stroke; }
+.edge.vert { stroke-dasharray: 6 5; }
+.edge.g-d2 { stroke: var(--d2); }
+.both .edge.g-d3 { stroke: var(--d3); }
+.edge.hl { stroke: var(--hi); stroke-width: 3; opacity: 1; }
+.islandLbl { font-family: var(--f-display); fill: var(--ink-soft); pointer-events: none; }
+@media (max-width: 760px) {
+  main { grid-template-columns: minmax(0,1fr); grid-template-rows: 62vh auto; }
+  body { height: auto; }
+  input[type=search] { width: 100%; }
+  .tools { margin-left: 0; width: 100%; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Valhalla World Map</h1>
+  <span class="meta" id="meta"></span>
+  <div class="tools">
+    <div class="seg" role="group" aria-label="Which game">
+      <button type="button" data-view="d3" aria-pressed="true">DikuMUD III</button>
+      <button type="button" data-view="d2" aria-pressed="false">DikuMUD II</button>
+      <button type="button" data-view="both" aria-pressed="false">Both</button>
+    </div>
+    <input type="search" id="q" placeholder="Find a zone or teleport name" aria-label="Find a zone">
+    <button id="fit" type="button">Whole map</button>
+  </div>
+</header>
+<main>
+  <div id="wrap" aria-label="Map of zones. Drag to move, scroll or pinch to zoom.">
+    <svg id="svg" role="img" aria-label="Zones and the exits between them">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--line)"/>
+        </marker>
+      </defs>
+      <g id="vp"><g id="edges"></g><g id="zones"></g><g id="dots"></g></g>
+    </svg>
+    <div class="zoom">
+      <button type="button" id="zin" aria-label="Zoom in">+</button>
+      <button type="button" id="zout" aria-label="Zoom out">−</button>
+    </div>
+  </div>
+  <aside id="side">
+    <div id="detail">
+      <div class="eyebrow">Zone</div>
+      <h2>Pick a zone</h2>
+      <p class="hint">Click a zone for its teleport point, monster levels, makers and exits. Dots on a zone's edge are its rooms with an exit to another zone; lines join them. Drag to move; scroll, pinch or + and − to zoom.</p>
+    </div>
+    <div id="results" hidden></div>
+    <div>
+      <h3>Key</h3>
+      <div class="legend">
+        <svg viewBox="0 0 26 16"><rect x="2" y="2" width="22" height="12" rx="2" fill="var(--box)" stroke="var(--d3)" stroke-width="1.5"/></svg><span>DikuMUD III zone (public source)</span>
+        <svg viewBox="0 0 26 16"><rect x="2" y="2" width="22" height="12" rx="2" fill="var(--box)" stroke="var(--d2)" stroke-width="1.5"/></svg><span>DikuMUD II zone</span>
+        <svg viewBox="0 0 26 16"><rect x="2" y="2" width="22" height="12" rx="2" fill="var(--box)" stroke="var(--both)" stroke-width="2.4"/></svg><span>In both games</span>
+        <svg viewBox="0 0 26 16"><circle cx="13" cy="8" r="4" fill="var(--sheet)" stroke="var(--line)" stroke-width="1.5"/></svg><span>Room with an exit to another zone</span>
+        <svg viewBox="0 0 26 16"><circle cx="13" cy="8" r="4" fill="var(--tele)"/></svg><span>Teleport point</span>
+        <svg viewBox="0 0 26 16"><line x1="1" y1="8" x2="25" y2="8" stroke="var(--line)" stroke-width="2"/></svg><span>Exit</span>
+        <svg viewBox="0 0 26 16"><line x1="1" y1="8" x2="25" y2="8" stroke="var(--line)" stroke-width="2" stroke-dasharray="5 4"/></svg><span>Up or down</span>
+        <svg viewBox="0 0 26 16"><line x1="1" y1="8" x2="21" y2="8" stroke="var(--line)" stroke-width="2"/><path d="M17 4 L25 8 L17 12 z" fill="var(--line)"/></svg><span>One way</span>
+      </div>
+      <p class="hint" style="margin-top:8px">A box's area grows with its number of rooms. In <b>Both</b>, lines are coloured by the game that has the exit.</p>
+    </div>
+    <p class="hint" id="about"></p>
+  </aside>
+</main>
+<script>
+const DATA = __DATA__;
+const NS = "http://www.w3.org/2000/svg";
+const DNAME = { n: "north", e: "east", s: "south", w: "west", u: "up", d: "down", ne: "northeast", nw: "northwest", se: "southeast", sw: "southwest" };
+const GNAME = { d3: "DikuMUD III", d2: "DikuMUD II" };
+const Z = DATA.zones;
+const el = (n, a, p) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); p && p.appendChild(e); return e; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const svg = document.getElementById("svg"), vp = document.getElementById("vp"), wrap = document.getElementById("wrap");
+const edgesG = document.getElementById("edges"), zonesG = document.getElementById("zones"), dotsG = document.getElementById("dots");
+const canvas = document.createElement("canvas").getContext("2d");
+let VIEW = "d3", V = null, view = { s: 1, x: 0, y: 0 }, selected = null, matches = new Set();
+let nodeByKey = new Map(), nodeOfZone = new Map(), drawn = [];
+
+document.getElementById("about").innerHTML =
+  `Built on ${esc(DATA.built)} from the public sources: <a href="https://github.com/Seifert69/DikuMUD3">DikuMUD III</a> ` +
+  `(${DATA.counts.d3.zones} of the ${DATA.counts.d3.listed} zones in its zone list are public) and ` +
+  `<a href="https://github.com/Seifert69/DikuMUD2">DikuMUD II</a> (${DATA.counts.d2.zones} zones), both LGPL-2.1. ` +
+  `Valhalla runs zones whose source isn't public, so it has more than this map. Only exits are drawn: ships, portals and ` +
+  `other moves made by scripts are not. An unofficial fan map: the game is the final word. ` +
+  `<a href="./">Midgaard room by room →</a>`;
+
+// The zone shown for a node: DikuMUD III's version when it has one
+const main = n => Z[n.m.find(k => k.startsWith("d3:")) || n.m[0]];
+const tagOf = n => n.m.length > 1 ? "both" : n.m[0].slice(0, 2);
+const teleOf = n => { for (const k of n.m) if (Z[k].teleport.length) return { z: Z[k], t: Z[k].teleport[0] }; return null; };
+
+function build() {
+  V = DATA.views[VIEW];
+  edgesG.replaceChildren(); zonesG.replaceChildren(); dotsG.replaceChildren();
+  svg.classList.toggle("both", VIEW === "both");
+  nodeByKey = new Map(V.nodes.map(n => [n.k, n]));
+  nodeOfZone = new Map(); V.nodes.forEach(n => n.m.forEach(k => nodeOfZone.set(k, n)));
+  drawn = [];
+  // Border rooms: a dot on the side its exit points to
+  const SIDE = { n: "t", ne: "t", nw: "t", u: "t", s: "b", se: "b", sw: "b", d: "b", e: "r", w: "l" };
+  const dotsOf = new Map();
+  for (const e of V.edges) {
+    const n = nodeByKey.get(e.a);
+    const key = e.g + ":" + e.fz + "/" + e.fr;
+    if (!dotsOf.has(n.k)) dotsOf.set(n.k, new Map());
+    const m = dotsOf.get(n.k);
+    if (!m.has(key)) m.set(key, { g: e.g, z: e.fz, r: e.fr, side: SIDE[e.d], node: n });
+  }
+  const dotPos = new Map();
+  for (const [k, m] of dotsOf) {
+    const n = nodeByKey.get(k), h = n.s / 2;
+    const bySide = { t: [], b: [], l: [], r: [] };
+    for (const d of m.values()) bySide[d.side].push(d);
+    for (const s in bySide) {
+      const list = bySide[s].sort((a, b) => a.r < b.r ? -1 : 1), L = list.length;
+      list.forEach((d, i) => {
+        const f = (i + 1) / (L + 1) * 2 - 1, off = f * (h - 10);
+        d.x = n.x + (s === "l" ? -h : s === "r" ? h : off);
+        d.y = n.y + (s === "t" ? -h : s === "b" ? h : off);
+        dotPos.set(d.g + ":" + d.z + "/" + d.r, d);
+      });
+    }
+  }
+  // One line per pair of rooms
+  const pairs = new Map();
+  for (const e of V.edges) {
+    const a = e.g + ":" + e.fz + "/" + e.fr, b = e.g + ":" + e.tz + "/" + e.tr;
+    const k = [a, b].sort().join("|");
+    const p = pairs.get(k) || { a, b, g: e.g, vert: false, dirs: new Set() };
+    p.vert = p.vert || e.d === "u" || e.d === "d"; p.dirs.add(a);
+    pairs.set(k, p);
+  }
+  for (const p of pairs.values()) {
+    const A = dotPos.get(p.a), B = dotPos.get(p.b);
+    if (!A || !B) continue;
+    const oneway = p.dirs.size === 1;
+    const [s, t] = oneway && !p.dirs.has(p.a) ? [B, A] : [A, B];
+    const ln = el("line", { x1: s.x, y1: s.y, x2: t.x, y2: t.y, class: `edge g-${p.g}${p.vert ? " vert" : ""}` }, edgesG);
+    if (oneway) ln.setAttribute("marker-end", "url(#arr)");
+    drawn.push({ el: ln, a: A.node.k, b: B.node.k });
+  }
+  for (const n of V.nodes) {
+    const z = main(n), tag = tagOf(n), h = n.s / 2;
+    const g = el("g", { class: `zone z-${tag}`, tabindex: "0", role: "button", "aria-label": z.title }, zonesG);
+    el("title", {}, g).textContent = z.title;
+    el("rect", { x: n.x - h, y: n.y - h, width: n.s, height: n.s, rx: 6, class: "box" }, g);
+    n.tEl = el("text", { class: "zt" }, g);
+    n.sEl = el("text", { class: "zs" }, g);
+    n.pEl = el("text", { class: "zp" }, g);
+    const b = el("text", { class: "badge", x: n.x + h - 6, y: n.y - h + 13, "text-anchor": "end" }, g);
+    b.textContent = tag === "both" ? "II+III" : tag === "d2" ? "II" : "III";
+    const lv = n.m.map(k => Z[k].levels).find(Boolean);
+    n.sub = `${n.m.map(k => Z[k].rooms).reduce((a, b) => Math.max(a, b))} rooms` + (lv ? ` · monsters lvl ${lv[0]}${lv[1] !== lv[0] ? "–" + lv[1] : ""}` : "");
+    const tp = teleOf(n);
+    n.tele = tp ? "✦ " + tp.t.name : (n.m.some(k => Z[k].walk) ? "no teleport · walk in" : "no teleport point");
+    if (!tp) n.pEl.classList.add("none");
+    n.g = g;
+    g.addEventListener("click", ev => { ev.stopPropagation(); select(n.k, false); });
+    g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select(n.k, false); } });
+  }
+  for (const d of dotPos.values()) {
+    const z = Z[d.g + ":" + d.z], room = z.border.find(b => b.r === d.r);
+    const isTp = z.teleport.length && z.teleport[0].room === d.r;
+    const c = el("circle", { cx: d.x, cy: d.y, class: "dot" + (isTp ? " tp" : "") }, dotsG);
+    el("title", {}, c).textContent = (room ? room.t : d.r) + " (" + z.title + ")";
+    c.addEventListener("click", ev => { ev.stopPropagation(); select(d.node.k, false); });
+    d.el = c;
+  }
+  // A teleport room that isn't on the edge: its dot sits in the box's lower left corner
+  for (const n of V.nodes) {
+    const tp = teleOf(n);
+    if (!tp || dotPos.has(tp.z.g + ":" + tp.z.id + "/" + tp.t.room)) continue;
+    const d = { g: tp.z.g, z: tp.z.id, r: tp.t.room, node: n, x: n.x - n.s / 2 + 14, y: n.y + n.s / 2 - 14 };
+    const c = el("circle", { cx: d.x, cy: d.y, class: "dot tp" }, dotsG);
+    el("title", {}, c).textContent = "Teleport point: " + tp.t.title;
+    c.addEventListener("click", ev => { ev.stopPropagation(); select(n.k, false); });
+    d.el = c; dotPos.set(d.g + ":" + d.z + "/" + d.r, d);
+  }
+  V.dots = [...dotPos.values()];
+  if (V.islands != null && V.nodes.some(n => n.y > V.islands)) {
+    const t = el("text", { class: "islandLbl", x: 0, y: V.islands - 30, "font-size": 34 }, edgesG);
+    t.textContent = "No exits to other zones in the source: reached by scripts, teleport, or not at all";
+  }
+  const nz = V.nodes.length, ne = V.edges.length;
+  document.getElementById("meta").innerHTML = `${nz} zones · ${ne} exits between zones · <a href="./">Midgaard rooms</a>`;
+}
+
+// Text that fits the box at the current zoom: a readable size on screen, cut to the box's width
+function fitText(t, maxW, px, font) {
+  canvas.font = `${px}px ${font}`;
+  if (canvas.measureText(t).width <= maxW) return t;
+  let lo = 0, hi = t.length;
+  while (lo < hi) { const m = (lo + hi + 1) >> 1; canvas.measureText(t.slice(0, m) + "…").width <= maxW ? lo = m : hi = m - 1; }
+  return lo ? t.slice(0, lo) + "…" : "";
+}
+const css = getComputedStyle(document.documentElement);
+const FD = css.getPropertyValue("--f-display"), FB = css.getPropertyValue("--f-body"), FM = css.getPropertyValue("--f-mono");
+function place() {
+  const s = view.s, k = 1 / s;
+  for (const n of V.nodes) {
+    const h = n.s / 2, wpx = (n.s - 16) * s;       // usable width in screen px
+    const tpx = Math.min(17, Math.max(11, 15 * s)), spx = Math.min(13, Math.max(10, 12 * s));
+    const showSub = n.s * s >= 120, top = n.y - h;
+    const lines = [[n.tEl, n.m.length ? main(n).title : "", tpx, FD, true]];
+    if (showSub) lines.push([n.sEl, n.sub, spx, FB, true], [n.pEl, n.tele, spx, FM, true]);
+    else { n.sEl.textContent = ""; n.pEl.textContent = ""; }
+    let y = top + (showSub ? 22 * k + 6 : n.s / 2 + tpx * k / 3);
+    for (const [e, t, px, font] of lines) {
+      if (wpx < 30) { e.textContent = ""; continue; }
+      e.textContent = fitText(t, wpx, px, font);
+      e.setAttribute("x", n.x - h + 8); e.setAttribute("y", y); e.setAttribute("font-size", px * k);
+      y += (px + 5) * k;
+    }
+  }
+  for (const d of V.dots) d.el.setAttribute("r", (d.el.classList.contains("tp") ? 5.5 : 4) * k);
+  edgesG.querySelectorAll("marker path");
+  document.querySelector("#arr").setAttribute("markerWidth", 9 * k);
+  document.querySelector("#arr").setAttribute("markerHeight", 9 * k);
+}
+let placeTimer = 0;
+const apply = () => { vp.setAttribute("transform", `translate(${view.x} ${view.y}) scale(${view.s})`); clearTimeout(placeTimer); placeTimer = setTimeout(place, 30); };
+function bounds() {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const n of V.nodes) { x0 = Math.min(x0, n.x - n.s / 2); y0 = Math.min(y0, n.y - n.s / 2); x1 = Math.max(x1, n.x + n.s / 2); y1 = Math.max(y1, n.y + n.s / 2); }
+  return { x0: x0 - 40, y0: y0 - 80, x1: x1 + 40, y1: y1 + 40 };
+}
+function fit() {
+  const b = bounds(), w = wrap.clientWidth, h = wrap.clientHeight;
+  view.s = Math.min(w / (b.x1 - b.x0), h / (b.y1 - b.y0));
+  view.x = (w - (b.x1 - b.x0) * view.s) / 2 - b.x0 * view.s;
+  view.y = (h - (b.y1 - b.y0) * view.s) / 2 - b.y0 * view.s;
+  apply();
+}
+function zoomAt(f, cx, cy) {
+  const ns = Math.max(0.03, Math.min(6, view.s * f)); f = ns / view.s;
+  view.x = cx - (cx - view.x) * f; view.y = cy - (cy - view.y) * f; view.s = ns; apply();
+}
+function centreOn(n) {
+  view.s = Math.max(view.s, Math.min(1.4, (wrap.clientWidth * 0.5) / n.s));
+  view.x = wrap.clientWidth / 2 - n.x * view.s; view.y = wrap.clientHeight / 2 - n.y * view.s; apply();
+}
+wrap.addEventListener("wheel", ev => { ev.preventDefault(); const b = wrap.getBoundingClientRect(); zoomAt(Math.exp(-ev.deltaY * 0.0015), ev.clientX - b.left, ev.clientY - b.top); }, { passive: false });
+const pts = new Map(); let last = null, pinch = null, moved = 0;
+wrap.addEventListener("pointerdown", ev => {
+  if (ev.target.closest("button")) return;
+  pts.set(ev.pointerId, [ev.clientX, ev.clientY]); moved = 0;
+  if (pts.size === 1) { last = [ev.clientX, ev.clientY]; wrap.classList.add("drag"); }
+  if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = Math.hypot(a[0] - b[0], a[1] - b[1]); }
+});
+wrap.addEventListener("pointermove", ev => {
+  if (!pts.has(ev.pointerId)) return;
+  pts.set(ev.pointerId, [ev.clientX, ev.clientY]);
+  if (pts.size === 2 && pinch) {
+    const [a, b] = [...pts.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]), r = wrap.getBoundingClientRect();
+    zoomAt(d / pinch, (a[0] + b[0]) / 2 - r.left, (a[1] + b[1]) / 2 - r.top); pinch = d; moved += 10;
+  } else if (last) {
+    view.x += ev.clientX - last[0]; view.y += ev.clientY - last[1]; moved += Math.abs(ev.clientX - last[0]) + Math.abs(ev.clientY - last[1]);
+    last = [ev.clientX, ev.clientY]; apply();
+  }
+  if (moved > 4 && !wrap.hasPointerCapture(ev.pointerId)) wrap.setPointerCapture(ev.pointerId);
+});
+const up = ev => { pts.delete(ev.pointerId); if (pts.size < 2) pinch = null; if (!pts.size) { last = null; wrap.classList.remove("drag"); } };
+wrap.addEventListener("pointerup", up); wrap.addEventListener("pointercancel", up);
+wrap.addEventListener("click", ev => { if (moved > 4) ev.stopPropagation(); }, true);
+document.getElementById("zin").onclick = () => zoomAt(1.5, wrap.clientWidth / 2, wrap.clientHeight / 2);
+document.getElementById("zout").onclick = () => zoomAt(1 / 1.5, wrap.clientWidth / 2, wrap.clientHeight / 2);
+document.getElementById("fit").onclick = fit;
+
+// What was checked in a running game (DikuMUD III only: there is no DikuMUD II server to try)
+function checked(z) {
+  const v = DATA.verified[z.g + ":" + z.id];
+  if (z.g === "d2") return "Worked out from the DikuMUD II zone file; not tried in a game.";
+  return v && v.ok ? `Tried in a test server on ${esc(v.on)}: it lands there.` : "Worked out from the zone file; not tried in a game.";
+}
+function walkChecked(z) {
+  const v = DATA.verified[z.g + ":" + z.id];
+  if (z.g === "d2" || !v || v.walk_ok == null) return "Worked out from the zone files; not tried in a game.";
+  return v.walk_ok ? `Tried in a test server on ${esc(v.on)}: it gets there.` :
+    `<b>Not confirmed:</b> in a test server on ${esc(v.on)} this walk ended in ${esc((v.walk_end || "").replace(/\s*\[.*\]$/, ""))} instead, so something in the game (a guard, a script) works differently from the zone file.`;
+}
+
+// The zone panel
+function zoneSection(z, n) {
+  const lv = z.levels ? `${z.levels[0]}${z.levels[1] !== z.levels[0] ? "–" + z.levels[1] : ""}` : "none loaded";
+  const yrs = z.years.length ? (z.years.length > 1 ? `${z.years[0]}–${z.years[z.years.length - 1]}` : z.years[0]) : "not given";
+  let tele;
+  if (z.teleport.length) {
+    const t = z.teleport[0], cmd = `cast controlled teleport ${t.name}`;
+    tele = `<div class="tele"><h3>Teleport point</h3><div class="cmd"><code>${esc(cmd)}</code><button type="button" data-copy="${esc(cmd)}">Copy</button></div>` +
+      `<p class="hint">Lands in <b>${esc(t.title)}</b>. ${checked(z)}</p>` +
+      (z.teleport.length > 1 ? `<p class="hint">Also: ${z.teleport.slice(1).map(o => `<code>${esc(o.name)}</code> (${esc(o.title)})`).join(", ")}</p>` : "") + `</div>`;
+  } else {
+    const why = z.named === 0 ? "none of its rooms has a name the spell can find" : z.blocked >= z.rooms ? "every room blocks teleport" : "no room passes the checks (name used elsewhere, teleport blocked, or an aggressive monster)";
+    tele = `<div class="tele"><h3>No teleport point</h3><p class="hint">${esc(why[0].toUpperCase() + why.slice(1))}.</p>` +
+      (z.walk ? `<div class="cmd"><code>${esc("cast controlled teleport " + z.walk.name)}</code><button type="button" data-copy="${esc("cast controlled teleport " + z.walk.name)}">Copy</button></div>` +
+        `<p class="hint">Lands in ${esc(Z[z.g + ":" + z.walk.zone].title)}. Then walk <b>${esc(z.walk.steps)}</b> to ${esc(z.walk.to)}. ${walkChecked(z)}</p>`
+        : `<p class="hint">No walk from any teleport point either, in the public source.</p>`) + `</div>`;
+  }
+  const links = z.border.map(b => {
+    const to = Z[z.g + ":" + b.z], tn = nodeOfZone.get(z.g + ":" + b.z);
+    const name = tn ? `<button type="button" class="go" data-go="${esc(tn.k)}">${esc(to.title)}</button>` : esc(to ? to.title : b.z);
+    return `<li>${esc(b.t)} <span class="dir">${DNAME[b.d]}</span> → ${name}<span class="hint"> · ${esc(b.tt)}</span></li>`;
+  }).join("");
+  const src = z.g === "d2" && z.in_d3_list ? `<p class="hint">Listed in DikuMUD III's zone list too, but its DikuMUD III source isn't public: this is the DikuMUD II version.</p>` : "";
+  return `${tele}<dl class="facts"><dt>Rooms</dt><dd>${z.rooms}</dd><dt>Monster levels</dt><dd>${lv}</dd>` +
+    `<dt>Made by</dt><dd>${z.creators.length ? esc(z.creators.join(", ")) : "not given"}</dd><dt>Years</dt><dd>${yrs}</dd></dl>${src}` +
+    `<div><h3>Exits to other zones</h3>${links ? `<ul class="links">${links}</ul>` : '<p class="hint">None in the source.</p>'}</div>` +
+    (z.notes ? `<details><summary>Builder's notes</summary><p class="notes">${esc(z.notes)}</p></details>` : "");
+}
+function select(key, centre) {
+  const n = nodeByKey.get(key); if (!n) return;
+  if (selected && nodeByKey.get(selected)) nodeByKey.get(selected).g.classList.remove("sel");
+  selected = key; n.g.classList.add("sel"); zonesG.appendChild(n.g);
+  for (const d of drawn) d.el.classList.toggle("hl", d.a === key || d.b === key);
+  if (centre) centreOn(n);
+  const zs = n.m.map(k => Z[k]).sort((a, b) => a.g < b.g ? 1 : -1);
+  const z = zs[0], tag = tagOf(n);
+  let html = `<div class="eyebrow"><span class="tag ${tag}">${tag === "both" ? "DikuMUD II + III" : GNAME[tag]}</span></div>` +
+    `<h2>${esc(z.title)}</h2><div class="id">${n.m.map(k => esc(k.slice(3)) + "@" + (k.startsWith("d3") ? "III" : "II")).join(" · ")}</div>`;
+  if (zs.length > 1) {
+    html += `<div><h3>DikuMUD III</h3></div>${zoneSection(zs[0], n)}<details><summary>The DikuMUD II version</summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">${zoneSection(zs[1], n)}</div></details>`;
+  } else html += zoneSection(z, n);
+  const det = document.getElementById("detail");
+  det.innerHTML = html;
+  det.style.display = "flex"; det.style.flexDirection = "column"; det.style.gap = "12px";
+  det.querySelectorAll("[data-go]").forEach(b => b.onclick = () => select(b.dataset.go, true));
+  det.querySelectorAll("[data-copy]").forEach(b => b.onclick = () => {
+    const ok = () => { b.textContent = "Copied"; setTimeout(() => b.textContent = "Copy", 1500); };
+    try { navigator.clipboard.writeText(b.dataset.copy).then(ok, () => {}); } catch (e) {}
+  });
+  try { history.replaceState(null, "", `#${VIEW}/${encodeURIComponent(key)}`); } catch (e) {}
+}
+// Search over this view's zones
+const q = document.getElementById("q"), results = document.getElementById("results");
+function search() {
+  const s = q.value.trim().toLowerCase();
+  V.nodes.forEach(n => n.g.classList.remove("match"));
+  matches = new Set();
+  if (!s) { results.hidden = true; return; }
+  const hits = V.nodes.filter(n => n.m.some(k => { const z = Z[k]; return z.title.toLowerCase().includes(s) || z.id.includes(s) || z.teleport.some(t => t.name.toLowerCase().includes(s)); }));
+  hits.forEach(n => { n.g.classList.add("match"); matches.add(n.k); });
+  results.hidden = false;
+  results.innerHTML = `<div class="eyebrow">${hits.length} zone${hits.length === 1 ? "" : "s"}</div>` +
+    hits.slice(0, 40).map(n => `<button type="button" data-go="${esc(n.k)}">${esc(main(n).title)} <span class="id">${esc(main(n).id)}</span></button>`).join("");
+  results.querySelectorAll("[data-go]").forEach(b => b.onclick = () => select(b.dataset.go, true));
+}
+q.addEventListener("input", search);
+q.addEventListener("keydown", ev => { if (ev.key === "Enter") { const b = results.querySelector("[data-go]"); b && b.click(); } });
+function setView(v, keep) {
+  VIEW = v;
+  document.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === v));
+  const prev = selected; selected = null;
+  build(); fit(); search();
+  // keep the same zone selected when it's in this view too
+  const want = keep || prev;
+  if (want) {
+    const zk = (nodeByKey.get(want) ? want : null) || (() => { for (const n of V.nodes) if (n.k === want || n.m.some(k => want.endsWith(k.slice(3)))) return n.k; })();
+    if (zk) select(zk, true);
+  }
+}
+document.querySelectorAll("[data-view]").forEach(b => b.onclick = () => setView(b.dataset.view));
+new ResizeObserver(() => { if (V) place(); }).observe(wrap);
+{
+  const m = decodeURIComponent(location.hash.slice(1)).match(/^(d3|d2|both)\/(.+)$/);
+  if (m) setView(m[1], m[2]); else { setView("d3"); select("d3:midgaard", true); }
+}
+if (document.fonts) document.fonts.ready.then(place);
+</script>
+</body>
+</html>
