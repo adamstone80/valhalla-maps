@@ -6,7 +6,8 @@ Interactive maps of [DikuMUD III](https://github.com/Seifert69/DikuMUD3) (Valhal
 
 **Open it:** https://adamstone80.github.io/midgaard-map/world.html
 
-- One box per zone, its area growing with its number of rooms, coloured by how dangerous its weakest monsters are: novices, some experience, seasoned, the mightiest.
+- One box per zone, its area growing with its number of rooms, coloured by how dangerous its weakest monsters are: novices (1–10), some experience (11–25), seasoned (26–40), the mightiest (41+). The colour key stays in the map's corner.
+- Zones are grouped into regions (Midgaard, Udgaard & Cypress, Haon-Dor, Ratswarf & Torsbay, Hades and others), each drawn as one area and laid out on its own, so the map reads as neighbourhoods. The list is `REGIONS` in `world.py`; a zone not in it joins the region it has most exits to.
 - **My level** fades the zones that don't suit a character of that level.
 - The star marks the Temple of Udgaard, where players start and come back after dying.
 - Dots on a box's edge are the rooms with an exit to another zone; lines join them (dashed: up or down; arrow: one way).

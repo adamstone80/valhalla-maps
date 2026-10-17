@@ -52,6 +52,28 @@ ENTRY = ("udgaard", "temple")  # DEFAULT_ENTRY_ZONE/NAME in zon_basis: where pla
 SYSTEM = {"basis", "basemove", "baseget", "baselook", "boards", "clans", "comm", "commands", "competition",
           "death", "function", "g_q", "guild_paths", "guilds", "helpzon", "mail", "quests", "randomt",
           "restrict", "set", "skills", "socials", "spells", "update", "wiz", "professions", "justice"}
+# Regions: neighbourhoods of zones, drawn as one area each, by zone id (both games). A zone
+# that isn't listed joins the region it has most exits to.
+REGIONS = {
+    "Midgaard": ["midgaard", "midwalls", "midsewers", "kingc", "arena", "sorcerer", "paladin_guild", "asgaard",
+                 "academy", "citadel", "reslab", "thievesguild", "mageguild", "fightersguild", "clericguild"],
+    "Udgaard & Cypress": ["udgaard", "offices", "newbie", "udsewer", "cypress", "rebirth", "youth",
+                                   "goblin_cave", "gremlin", "barbarian", "clan_koh", "haunted"],
+    "Haon-Dor": ["haon_dor", "halfzon", "elfdom", "toy", "ogre1", "ogre", "fields", "forest", "wcastle", "blcastle"],
+    "Ratswarf & Torsbay": ["ratswarf", "torsbay", "farm", "farm1", "hobgob", "gazha", "bounty", "ww1", "ww2", "tower",
+                             "cloud", "houses", "garden", "lostlands", "cthulu", "hills", "dwarves", "rotten"],
+    "Nymgaard & Mystic Forest": ["nymgaard", "trees", "psionic", "sandzone", "sands2", "talen", "foothill",
+                                       "ranger", "monk", "vine"],
+    "Urland & Mountains": ["urland", "mount", "akaren", "arctic", "skaven", "tiamat", "gnome", "darkelf",
+                                 "volcano", "hades1"],
+    "Hades": ["hades2", "hades3", "hades4", "hades5", "hades6", "hades7", "hades8"],
+    "Moors & Swamps": ["moor", "hamlet", "manse", "deadl1", "keep", "center", "etznab", "seren", "seren1",
+                         "gobtown", "gobtown1"],
+    "Xiyang & Desert": ["outxiyang", "xiyang", "xiyang2", "desert", "arabian", "assassin", "deathlink", "isledead",
+                              "cemetery", "necro_guild", "neptune", "warntz", "demon_realm", "abyss1", "ishlor"],
+    "Atlantis": ["atl_beach", "atl_sea", "atl_misc"],
+}
+REGION_OF = {z: r for r, zs in REGIONS.items() for z in zs}
 DIRS = ["n", "e", "s", "w", "u", "d", "ne", "nw", "se", "sw"]
 DVEC = {"n": (0, -1), "e": (1, 0), "s": (0, 1), "w": (-1, 0), "ne": (.71, -.71), "nw": (-.71, -.71),
         "se": (.71, .71), "sw": (-.71, .71), "u": (0, 0), "d": (0, 0)}
@@ -385,6 +407,9 @@ def compress(steps):
 
 # ---------------------------------------------------------------- views and layout
 
+SPACE, PAD = 140, 90  # between linked zones' edges, and the least between any two in a group
+
+
 def side(rooms):
     return 150 + 12 * math.sqrt(max(rooms, 1))
 
@@ -423,7 +448,7 @@ def layout(nodes, edges, anchor):
             for m, v in adj[k]:
                 if m in pos:
                     continue
-                L = (nodes[k] + nodes[m]) / 2 + 90
+                L = (nodes[k] + nodes[m]) / 2 + SPACE
                 if v and (v[0] or v[1]):
                     pos[m] = [pos[k][0] + v[0] * L, pos[k][1] + v[1] * L]
                 else:
@@ -435,7 +460,7 @@ def layout(nodes, edges, anchor):
         for it in range(500):
             k_spring = 0.25 if it < 350 else 0.08
             for a, b, v in cedges:
-                L = (nodes[a] + nodes[b]) / 2 + 90
+                L = (nodes[a] + nodes[b]) / 2 + SPACE
                 dx, dy = pos[b][0] - pos[a][0], pos[b][1] - pos[a][1]
                 if v and (v[0] or v[1]):
                     tx, ty = v[0] * L, v[1] * L
@@ -466,7 +491,7 @@ def layout(nodes, edges, anchor):
             for i in range(len(ks)):
                 for j in range(i + 1, len(ks)):
                     a, b = ks[i], ks[j]
-                    need = (nodes[a] + nodes[b]) / 2 + 60
+                    need = (nodes[a] + nodes[b]) / 2 + PAD
                     dx, dy = pos[b][0] - pos[a][0], pos[b][1] - pos[a][1]
                     ox, oy = need - abs(dx), need - abs(dy)
                     if ox > 0 and oy > 0:
@@ -547,8 +572,142 @@ def build_view(view, games, match):
             v = (v[0] / L, v[1] / L)
         lay_edges.append((a, b, v))
     anchor = next((k for k in ("d3:midgaard", "d2:midgaard") if k in visible), None)
-    pos, island_top = layout(size, lay_edges, anchor)
-    return nodes, edges, visible, size, pos, island_top
+    reg = regions_of(visible, lay_edges)
+    pos, island_top, frames = layout_regions(size, lay_edges, anchor, reg)
+    return nodes, edges, visible, size, pos, island_top, frames, reg
+
+
+def regions_of(visible, lay_edges):
+    """node -> region name: the listed one, else the region it has most exits to"""
+    reg = {k: REGION_OF.get(k.split(":", 1)[1]) for k in visible}
+    links = collections.defaultdict(collections.Counter)
+    for a, b, _ in lay_edges:
+        links[a][b] += 1
+        links[b][a] += 1
+    for _ in range(len(visible)):
+        changed = False
+        for k in sorted(visible):
+            if reg[k] is None:
+                votes = collections.Counter()
+                for m, n in links[k].items():
+                    if reg.get(m):
+                        votes[reg[m]] += n
+                if votes:
+                    reg[k] = votes.most_common(1)[0][0]
+                    changed = True
+        if not changed:
+            break
+    return reg
+
+
+def layout_regions(size, lay_edges, anchor, reg):
+    """Each region laid out on its own, then the regions placed apart, joined the way their
+    exits point. Zones with no exits at all go on a shelf below. Returns centres, the shelf's
+    top, and the regions' frames."""
+    linked = {k for a, b, _ in lay_edges for k in (a, b)}
+    islands = {k for k in size if k not in linked}
+    names = sorted({reg[k] for k in size if k not in islands and reg[k]}, key=lambda r: list(REGIONS).index(r) if r in REGIONS else 99)
+    for k in size:
+        if k not in islands and not reg[k]:
+            reg[k] = "Elsewhere"
+            if "Elsewhere" not in names:
+                names.append("Elsewhere")
+    HEAD, MARGIN, GAP = 150, 90, 260  # title space, inner margin, least gap between regions
+    local, frame = {}, {}
+    for r in names:
+        mine = {k: size[k] for k in size if reg[k] == r and k not in islands}
+        inner = [(a, b, v) for a, b, v in lay_edges if a in mine and b in mine]
+        hub = anchor if anchor in mine else max(mine, key=lambda k: (sum(1 for a, b, _ in inner if k in (a, b)), mine[k]))
+        p, _ = layout(mine, inner, hub)
+        x0 = min(p[k][0] - mine[k] / 2 for k in mine); y0 = min(p[k][1] - mine[k] / 2 for k in mine)
+        x1 = max(p[k][0] + mine[k] / 2 for k in mine); y1 = max(p[k][1] + mine[k] / 2 for k in mine)
+        # wide enough for its name at the whole-map zoom (about 65 units a letter)
+        w = max(x1 - x0 + 2 * MARGIN, len(r) * 65 + 160)
+        dx = (w - (x1 - x0)) / 2
+        local[r] = {k: (p[k][0] - x0 + dx, p[k][1] - y0 + MARGIN + HEAD) for k in mine}
+        frame[r] = [w, y1 - y0 + 2 * MARGIN + HEAD]
+    # regions joined by exits, pointing the average way their exits go
+    rv = collections.defaultdict(lambda: [0.0, 0.0, 0])
+    for a, b, v in lay_edges:
+        ra, rb = reg.get(a), reg.get(b)
+        if not ra or not rb or ra == rb or a in islands or b in islands:
+            continue
+        key, sgn = ((ra, rb), 1) if ra < rb else ((rb, ra), -1)
+        if v:
+            rv[key][0] += sgn * v[0]; rv[key][1] += sgn * v[1]
+        rv[key][2] += 1
+    first = reg.get(anchor) if anchor in reg and anchor not in islands else names[0]
+    c = {first: [0.0, 0.0]}
+    q = [first]
+    turn = collections.Counter()
+    while q:
+        r = q.pop(0)
+        for (ra, rb), (vx, vy, n) in sorted(rv.items(), key=lambda t: -t[1][2]):
+            if r not in (ra, rb):
+                continue
+            o, sg = (rb, 1) if r == ra else (ra, -1)
+            if o in c:
+                continue
+            d = math.hypot(vx, vy)
+            ang = math.atan2(sg * vy, sg * vx) if d > .3 else 0.8 + turn[r] * 1.3
+            turn[r] += 1
+            L = (max(frame[r]) + max(frame[o])) / 2 + GAP
+            c[o] = [c[r][0] + math.cos(ang) * L, c[r][1] + math.sin(ang) * L]
+            q.append(o)
+    apart = [r for r in names if r not in c]  # no exits to another region: placed below
+    names = [r for r in names if r in c]
+    # pull linked regions together, keep every two apart by GAP
+    for it in range(800):
+        if it < 400:
+            for (ra, rb), (vx, vy, n) in rv.items():
+                dx, dy = c[rb][0] - c[ra][0], c[rb][1] - c[ra][1]
+                k = 0.02
+                c[ra][0] += dx * k; c[ra][1] += dy * k
+                c[rb][0] -= dx * k; c[rb][1] -= dy * k
+        moved = False
+        for i, ra in enumerate(names):
+            for rb in names[i + 1:]:
+                dx, dy = c[rb][0] - c[ra][0], c[rb][1] - c[ra][1]
+                ox = (frame[ra][0] + frame[rb][0]) / 2 + GAP - abs(dx)
+                oy = (frame[ra][1] + frame[rb][1]) / 2 + GAP - abs(dy)
+                if ox > 0 and oy > 0:
+                    moved = True
+                    if ox < oy:
+                        s = (1 if dx >= 0 else -1) * (ox / 2 + 1)
+                        c[ra][0] -= s; c[rb][0] += s
+                    else:
+                        s = (1 if dy >= 0 else -1) * (oy / 2 + 1)
+                        c[ra][1] -= s; c[rb][1] += s
+        if it >= 400 and not moved:
+            break
+    placed, frames = {}, []
+    gx0 = min(c[r][0] - frame[r][0] / 2 for r in names); gy0 = min(c[r][1] - frame[r][1] / 2 for r in names)
+    for r in names:
+        fx, fy = c[r][0] - frame[r][0] / 2 - gx0, c[r][1] - frame[r][1] / 2 - gy0
+        for k, (x, y) in local[r].items():
+            placed[k] = (x + fx, y + fy)
+        frames.append(dict(n=r, x=round(fx, 1), y=round(fy, 1), w=round(frame[r][0], 1), h=round(frame[r][1], 1)))
+    y = max(f["y"] + f["h"] for f in frames) + GAP
+    x = 0.0
+    for r in apart:
+        for k, (lx, ly) in local[r].items():
+            placed[k] = (lx + x, ly + y)
+        frames.append(dict(n=r, x=round(x, 1), y=round(y, 1), w=round(frame[r][0], 1), h=round(frame[r][1], 1)))
+        x += frame[r][0] + GAP
+    # zones with no exits at all: a shelf below everything
+    island_top = None
+    if islands:
+        width = max(f["x"] + f["w"] for f in frames)
+        y = max(f["y"] + f["h"] for f in frames) + GAP + 80
+        island_top, x, row_h = y, 0.0, 0
+        for n in sorted(islands, key=lambda n: -size[n]):
+            s = size[n]
+            if x > 0 and x + s > width:
+                x, y, row_h = 0.0, y + row_h + 60, 0
+            placed[n] = (x + s / 2, y + s / 2)
+            x += s + 60
+            row_h = max(row_h, s)
+    return placed, island_top, frames
 
 
 def match_zones(z3, z2):
@@ -605,17 +764,17 @@ def main():
 
     views = {}
     for vname, vgames in (("d3", ("d3",)), ("d2", ("d2",)), ("both", ("d3", "d2"))):
-        nodes, edges, visible, size, pos, island_top = build_view(vgames, games, match)
+        nodes, edges, visible, size, pos, island_top, frames, reg = build_view(vgames, games, match)
         vn = []
         for k in visible:
             members = [f"{g}:{z}" for g, z in nodes[k]]
-            vn.append(dict(k=k, m=members, x=round(pos[k][0], 1), y=round(pos[k][1], 1), s=round(size[k], 1)))
+            vn.append(dict(k=k, m=members, x=round(pos[k][0], 1), y=round(pos[k][1], 1), s=round(size[k], 1), r=reg.get(k)))
         ve = []
         for (a, b), ex in edges.items():
             if a in visible and b in visible:
                 for e in ex:
                     ve.append(dict(a=a, b=b, **e))
-        views[vname] = dict(nodes=vn, edges=ve, islands=island_top)
+        views[vname] = dict(nodes=vn, edges=ve, islands=island_top, regions=frames)
         print(f"view {vname}: {len(vn)} zones, {len(ve)} exits", file=sys.stderr)
 
     # teleport points and walks checked in a running DikuMUD III (tools/verify_teleports.py)

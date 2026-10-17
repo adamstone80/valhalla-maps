@@ -16,6 +16,7 @@
   --both: #3d4a42;    /* in both */
   --tele: #6b3fa0;    /* teleport */
   --hi: #d9a21b; --line: #3d4a42; --box: #fbfcf7;
+  --region: #e8ecdd; --region-edge: #cbd3bf;  /* a region's backdrop */
   /* danger, by the lowest monster levels: novice, experienced, seasoned, mighty */
   --b1: #e3f0d6; --b2: #d9eaf0; --b3: #f6e7c4; --b4: #f3d4cc; --b0: #fbfcf7;
   --b1i: #4f7a2c; --b2i: #2f6a80; --b3i: #93690f; --b4i: #9b3a28;
@@ -28,6 +29,7 @@
   :root:not([data-theme="light"]) {
     --paper: #121815; --sheet: #18201c; --ink: #dfe6d8; --ink-soft: #97a597; --rule: #2e3a33;
     --d3: #6fb497; --d2: #e3b84a; --both: #c9d3c6; --tele: #c4a0f0; --hi: #f2c14e; --line: #9fb0a4; --box: #1d2722;
+    --region: #1c241f; --region-edge: #2f3b34;
     --b1: #1f3020; --b2: #1b2b33; --b3: #33291a; --b4: #3a221e; --b0: #1d2722;
     --b1i: #9ccc7a; --b2i: #7cc0d8; --b3i: #e0b45a; --b4i: #ec8c78;
     color-scheme: dark;
@@ -36,6 +38,7 @@
 :root[data-theme="dark"] {
   --paper: #121815; --sheet: #18201c; --ink: #dfe6d8; --ink-soft: #97a597; --rule: #2e3a33;
   --d3: #6fb497; --d2: #e3b84a; --both: #c9d3c6; --tele: #c4a0f0; --hi: #f2c14e; --line: #9fb0a4; --box: #1d2722;
+  --region: #1c241f; --region-edge: #2f3b34;
   --b1: #1f3020; --b2: #1b2b33; --b3: #33291a; --b4: #3a221e; --b0: #1d2722;
   --b1i: #9ccc7a; --b2i: #7cc0d8; --b3i: #e0b45a; --b4i: #ec8c78;
   color-scheme: dark;
@@ -162,6 +165,14 @@ details[open] > summary { margin-bottom: 6px; }
 .edge.hl { stroke: var(--hi); stroke-width: 3; opacity: 1; }
 .edge.route { stroke: var(--hi); stroke-width: 4; opacity: 1; stroke-dasharray: none; }
 .islandLbl { font-family: var(--f-display); fill: var(--ink-soft); pointer-events: none; }
+.region { fill: var(--region); stroke: var(--region-edge); stroke-width: 1.5; vector-effect: non-scaling-stroke; pointer-events: none; }
+.regionLbl { font-family: var(--f-display); fill: var(--ink-soft); letter-spacing: .03em; pointer-events: none; }
+/* the danger colours, always on the map */
+#dangerkey { position: absolute; left: 10px; top: 10px; z-index: 4; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px;
+  max-width: calc(100% - 64px); padding: 6px 8px; border: 1px solid var(--rule); border-radius: 6px;
+  background: color-mix(in srgb, var(--sheet) 92%, transparent); font-size: .8rem; pointer-events: none; }
+#dangerkey .dk-t { color: var(--ink-soft); margin-right: 2px; }
+#dangerkey .band { font-weight: 500; }
 
 /* phone: the map fills the screen; the zone slides up from the bottom */
 @media (max-width: 760px) {
@@ -182,6 +193,7 @@ details[open] > summary { margin-bottom: 6px; }
   .grab::before { content: ""; display: block; width: 40px; height: 4px; border-radius: 2px; background: var(--rule); margin: 0 auto 4px; }
   .mapbtns { bottom: calc(42dvh + 10px); }
   #key { bottom: calc(42dvh + 10px); }
+  #dangerkey { left: 6px; top: 6px; padding: 4px 6px; font-size: .72rem; gap: 3px 4px; }
 }
 </style>
 </head>
@@ -211,8 +223,14 @@ details[open] > summary { margin-bottom: 6px; }
           <path d="M0 0 L10 5 L0 10 z" fill="var(--line)"/>
         </marker>
       </defs>
-      <g id="vp"><g id="edges"></g><g id="zones"></g><g id="dots"></g><g id="labels"></g></g>
+      <g id="vp"><g id="regions"></g><g id="edges"></g><g id="zones"></g><g id="dots"></g><g id="labels"></g></g>
     </svg>
+    <div id="dangerkey" role="note" aria-label="Colours: how dangerous a zone's weakest monsters are">
+      <span class="dk-t"><span class="long">Danger, by the weakest monsters:</span><span class="short">Danger:</span></span>
+      <span class="band b1"><span class="long">Novices · </span>1–10</span><span class="band b2"><span class="long">Some experience · </span>11–25</span>
+      <span class="band b3"><span class="long">Seasoned · </span>26–40</span><span class="band b4"><span class="long">Only the mightiest · </span>41+</span>
+      <span class="band b0 long">No monsters</span>
+    </div>
     <div id="key" hidden>
       <h3>Key</h3>
       <div class="legend">
@@ -224,6 +242,7 @@ details[open] > summary { margin-bottom: 6px; }
         <svg viewBox="0 0 26 16"><rect x="2" y="2" width="22" height="12" rx="2" fill="var(--box)" stroke="var(--d2)" stroke-width="1.5"/></svg><span>Zone from DikuMUD II</span>
         <svg viewBox="0 0 26 16"><rect x="2" y="2" width="22" height="12" rx="2" fill="var(--box)" stroke="var(--both)" stroke-width="2.4"/></svg><span>In both games</span>
         <svg viewBox="0 0 26 16" opacity=".5"><rect x="2" y="2" width="22" height="12" rx="2" fill="var(--box)" stroke="var(--d2)" stroke-width="1.5" stroke-dasharray="4 3"/></svg><span>Not on Valhalla</span>
+        <svg viewBox="0 0 26 16"><rect x="1" y="1" width="24" height="14" rx="3" class="region"/></svg><span>Region: zones that lie together</span>
         <svg viewBox="0 0 26 16"><path d="M13 2 L15.4 6.6 L20.5 7.2 L16.7 10.6 L17.8 15.5 L13 13 L8.2 15.5 L9.3 10.6 L5.5 7.2 L10.6 6.6 Z" class="start"/></svg><span>Where you start</span>
         <svg viewBox="0 0 26 16"><circle cx="13" cy="8" r="4" fill="var(--sheet)" stroke="var(--line)" stroke-width="1.5"/></svg><span>Room with an exit to another zone</span>
         <svg viewBox="0 0 26 16"><circle cx="13" cy="8" r="4" fill="var(--tele)"/></svg><span>Teleport point</span>
@@ -258,7 +277,7 @@ const Z = DATA.zones;
 const el = (n, a, p) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); p && p.appendChild(e); return e; };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const svg = document.getElementById("svg"), vp = document.getElementById("vp"), wrap = document.getElementById("wrap");
-const edgesG = document.getElementById("edges"), zonesG = document.getElementById("zones"), dotsG = document.getElementById("dots"), labelsG = document.getElementById("labels");
+const regionsG = document.getElementById("regions"), edgesG = document.getElementById("edges"), zonesG = document.getElementById("zones"), dotsG = document.getElementById("dots"), labelsG = document.getElementById("labels");
 const side = document.getElementById("side");
 const canvas = document.createElement("canvas").getContext("2d");
 let VIEW = "both", V = null, view = { s: 1, x: 0, y: 0 }, selected = null, LEVEL = null;
@@ -285,7 +304,11 @@ const fits = (n, L) => { const lv = levelsOf(n); return !lv || (lv[0] <= L + 3 &
 
 function build() {
   V = DATA.views[VIEW];
-  edgesG.replaceChildren(); zonesG.replaceChildren(); dotsG.replaceChildren(); labelsG.replaceChildren();
+  regionsG.replaceChildren(); edgesG.replaceChildren(); zonesG.replaceChildren();
+  for (const f of V.regions || []) {
+    el("rect", { class: "region", x: f.x, y: f.y, width: f.w, height: f.h, rx: 60 }, regionsG);
+    f.tEl = el("text", { class: "regionLbl" }, regionsG);
+  } dotsG.replaceChildren(); labelsG.replaceChildren();
   svg.classList.toggle("both", VIEW === "both");
   nodeByKey = new Map(V.nodes.map(n => [n.k, n]));
   nodeOfZone = new Map(); V.nodes.forEach(n => n.m.forEach(k => nodeOfZone.set(k, n)));
@@ -414,6 +437,12 @@ const css = getComputedStyle(document.documentElement);
 const FD = css.getPropertyValue("--f-display"), FB = css.getPropertyValue("--f-body"), FM = css.getPropertyValue("--f-mono"), FS = css.getPropertyValue("--f-story");
 function place() {
   const s = view.s, k = 1 / s;
+  // region names: big enough to read at any zoom, never wider than the region
+  for (const f of V.regions || []) {
+    const px = Math.min(30, Math.max(12, 40 * s)), wpx = (f.w - 80) * s;
+    f.tEl.textContent = wpx > 40 ? fitText(f.n, wpx, px, FD) : "";
+    f.tEl.setAttribute("x", f.x + 40); f.tEl.setAttribute("y", f.y + 40 + px * k); f.tEl.setAttribute("font-size", px * k);
+  }
   const placed = [];       // screen rectangles of labels drawn so far
   const order = [...V.nodes].sort((a, b) => (b === nodeByKey.get(selected)) - (a === nodeByKey.get(selected)) || b.s - a.s);
   for (const n of order) {
@@ -470,14 +499,17 @@ const apply = () => { vp.setAttribute("transform", `translate(${view.x} ${view.y
 function bounds() {
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
   for (const n of V.nodes) { x0 = Math.min(x0, n.x - n.s / 2); y0 = Math.min(y0, n.y - n.s / 2); x1 = Math.max(x1, n.x + n.s / 2); y1 = Math.max(y1, n.y + n.s / 2); }
+  for (const f of V.regions || []) { x0 = Math.min(x0, f.x); y0 = Math.min(y0, f.y); x1 = Math.max(x1, f.x + f.w); y1 = Math.max(y1, f.y + f.h); }
   return { x0: x0 - 40, y0: y0 - 80, x1: x1 + 40, y1: y1 + 60 };
 }
 const mapH = () => wrap.clientHeight - (matchMedia("(max-width: 760px)").matches ? side.offsetHeight : 0);
 function fit() {
-  const b = bounds(), w = wrap.clientWidth, h = mapH();
+  // below the danger key, which stays on the map
+  const top = document.getElementById("dangerkey").offsetHeight + 12;
+  const b = bounds(), w = wrap.clientWidth, h = mapH() - top;
   view.s = Math.min(w / (b.x1 - b.x0), h / (b.y1 - b.y0));
   view.x = (w - (b.x1 - b.x0) * view.s) / 2 - b.x0 * view.s;
-  view.y = (h - (b.y1 - b.y0) * view.s) / 2 - b.y0 * view.s;
+  view.y = top + (h - (b.y1 - b.y0) * view.s) / 2 - b.y0 * view.s;
   apply();
 }
 function zoomAt(f, cx, cy) {
