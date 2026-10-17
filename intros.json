@@ -1,0 +1,662 @@
+{
+ "d2:abyss1": {
+  "edited": false,
+  "hash": "c4a79dbc3164f592",
+  "intro": "The Styx boatman will ferry you to a plain of ash under a sunless sky. There, in a dark pit, a skull fortress hangs from four huge chains, and Goruk paces within. Across the river, vrocks pick over a battlefield, hunting surviving devils. They say a search for things lost there pays in great knowledge, and a favour for someone in need earns a trinket. Only the mightiest should go.",
+  "teaser": "A skull fortress hangs on four chains above a pit in a plain of ash."
+ },
+ "d2:academy": {
+  "edited": false,
+  "hash": "4800de20c9c1d86e",
+  "intro": "In Arcanus stands the Fortress of High Wizardry, four schools: Pain, the Elements, Mind and Conjuring. Its Master of Pain whets his scythe on a goblin femur; the Master of the Mind floats two feet off the floor, staring at nothing. Below, a dirt hole drops so deep you'll wonder if it has a bottom. Seasoned hands only, and the masters suit the mightiest. They say a wandering scholar wants a favour done, for a trinket.",
+  "teaser": "Four schools of wizardry, a scythe whetted on goblin bone, and a hole below."
+ },
+ "d2:akaren": {
+  "edited": false,
+  "hash": "b89aeb25a61d56e3",
+  "intro": "Northeast of Urland the mountain trees grow dark and scraggly, and the trail ends at Akaren Keep. Behind its walls draconians are getting ready for war, and Midgaard won't like it if they finish. Only the mightiest companies should try to force their way in. And mark this: killing a draconian is only the start of your trouble, for strange things happen when they die. Chants to Tiamat drift from within.",
+  "teaser": "Draconians are massing for war in a mountain keep, and their deaths bring worse."
+ },
+ "d2:arabian": {
+  "edited": false,
+  "hash": "41f202979ca7bb22",
+  "intro": "Cross the desert and you'll hear Khorsabad before you see it, the haggling on Bazaar Street drowning out near everything else. Through the palace gate rise the spires and domes of the Sultan; down on Wharf Street, rats scurry from your boots. And somewhere in the city Sinbad the Sailor tells his tall tales. They say a long journey through many hands ends in armour. Only the mightiest should walk those streets.",
+  "teaser": "Haggling bazaars, a Sultan's domes and Sinbad's tall tales, for only the mightiest."
+ },
+ "d2:arctic": {
+  "edited": false,
+  "hash": "707bc9980ea3442e",
+  "intro": "Come through the mountain pass and the world turns white, the wind lashing until it numbs your wits. Yet smoke curls from a dwarven outpost behind rune-carved doors, and furs are sold there. Across a deep rift stands a spire carved with grinning skulls, where a decayed thing sits a golden throne. They say a long journey gathering precious things ends in armour. Bring some experience; bring more for the spire.",
+  "teaser": "Beyond a dwarven outpost in the white wastes, a decayed thing keeps a golden throne."
+ },
+ "d2:asgaard": {
+  "edited": false,
+  "hash": "79d75c2adbb58307",
+  "intro": "Cross the Bifrost Bridge and you reach a field of weeds nobody tends, where something shrill on the wind might be screaming. Past the Golden Gates the palace still dazzles, though its fountains lie shattered and Odin sits pondering the doom to come. Inside is a map of Midgaard strewn with figurines. Go seasoned or not at all; the gods are for the mightiest alone. They whisper of riddles, and of something precious lost.",
+  "teaser": "Beyond the Bifrost, a crumbling golden palace where Odin broods on the coming doom."
+ },
+ "d2:atl_beach": {
+  "edited": false,
+  "hash": "c4144cc0b2a1152c",
+  "intro": "Walk the strand beneath the cliffs, holes pocking the rock, and listen to the breakers of the Numorean ocean. Old sea-dogs swear a colossal city lies beneath them. Watch your step: giant scorpions prowl, a crawler gapes up out of the sand, and a spider keeps its lair. Ground for seasoned travellers only. They say one hunt there ends in a sorrowful plea for mercy, and a small task brings peace and quiet.",
+  "teaser": "Sea-dogs swear a colossal city lies beneath these breakers, but the sand bites back."
+ },
+ "d2:atl_misc": {
+  "edited": false,
+  "hash": "78ff115242a7d86e",
+  "intro": "You'll know the Golden Ankh by her deck. It's scrubbed so clean you could eat your supper off it, and brass cannons shine along her side. Below, the hold is stocked with salted beef, limes and tar for dangerous, barely-charted waters. The sailor aboard is smart and keeps the peace, but only seasoned hands should think of picking a quarrel there. And that great rudder? Try as you might, you won't shift it an inch.",
+  "teaser": "A spotless ship with shining cannons, stocked for dangerous, barely-charted waters."
+ },
+ "d2:atl_sea": {
+  "edited": false,
+  "hash": "fd1def3912fcedab",
+  "intro": "Wade out past the Numorean shore and the waves will fight you every step, soggy to the waist and then to the neck. Duck under, though, and it turns serene: silver shoals, drifting fronds, little lights sparkling in the gloom. Mermaids gather seaweed there. Sharks drift by, pretending not to notice you. And somewhere a siren called Lorelei sits combing her hair and singing. Seasoned folk only, and the hardiest of those.",
+  "teaser": "Where Atlantis sank, the waves fight you, sharks drift by, and a siren sings."
+ },
+ "d2:blcastle": {
+  "edited": false,
+  "hash": "eba8053b370d8ad6",
+  "intro": "Between the Black Castle and the White lie the killing fields, where two kingdoms still bleed whenever they meet. It began when a prince vanished on his wedding day and his bride used his golden wedding dagger on herself. Walk the Black walls past cauldrons meant for boiling oil. The stable horses suit a novice; the King's guards would test the mightiest. They say a rescue that tests your memory is rewarded with a weapon.",
+  "teaser": "Two castles, one vanished bridegroom, and fields that still run red between them."
+ },
+ "d2:cemetery": {
+  "edited": false,
+  "hash": "d60965c3ff380add",
+  "intro": "Out in the mist drifts a longship, friend: dragon prow, torn sail, a deck greased with strange white ash, and a helmsman who just sits staring at nothing. Then there's the graveyard past a rusted iron gate, where low voices chant from the ground beneath mossy stones and small red lights vanish when you turn to look. It's no place for the green, but folk with some experience should manage it.",
+  "teaser": "A ghost-quiet longship, a fog that glows, and voices chanting beneath the graves."
+ },
+ "d2:center": {
+  "edited": false,
+  "hash": "ca73fe5d1c669763",
+  "intro": "Past the Death Swamps, a cavern of half-legible runes leads to stairs of cold black metal, spiralling toward the centre of the earth. Below lie planes of rock, sky, ice and flame, each with a shrine to a four-headed beast and the dread of its guardian. In the fire, your canteen's water flees as vapour. Only the mightiest belong there. They say the long road ends in a powerful weapon.",
+  "teaser": "Stairs of cold black metal spiral down through earth, air, water and fire."
+ },
+ "d2:citadel": {
+  "edited": false,
+  "hash": "b23d95c44c7a58df",
+  "intro": "Walk into the Citadel and you may find a room grown by magic past all sense, filled with thousands of freshly made soldiers waiting for orders. Elsewhere lie the Black Caves, nothing but unrelenting black stone, and a desolate plain where no sun shows, only gleaming white stars. It's ground for seasoned fighters. They say a perilous trial there rewards veterans with a mighty weapon.",
+  "teaser": "A citadel of freshly made soldiers, black caves, and a plain where no sun shows."
+ },
+ "d2:cloud": {
+  "edited": false,
+  "hash": "c1b5ef2714604782",
+  "intro": "Past Dark Wood's edge, a beanstalk climbs into the sky, all broad leaves and massive pea pods. Up top, the clouds hold your weight, until the breeze opens a gap and the ground leers up at you from far below. A chain of pure gold climbs higher still, each link larger than your body. They say an old soul wants an errand run, and there's a riddle besides. Come seasoned; some parts are for the mightiest alone.",
+  "teaser": "Climb a fairy-tale beanstalk and walk on clouds, if the gaps don't take you."
+ },
+ "d2:cthulu": {
+  "edited": false,
+  "hash": "e818f09c212fb40e",
+  "intro": "The jungle closes over you, so thick the sun barely gets through. Mist clings to your armour, and noises come from every side: some are bird calls, the rest you would rather not think about. A white-water river runs straight off the biggest waterfall you're likely to see. Children laugh somewhere among thatched huts, and a twisted witch doctor walks these parts too. Go only if you're seasoned.",
+  "teaser": "Mist, a huge waterfall, children's laughter and a twisted witch doctor deep in the jungle."
+ },
+ "d2:darkelf": {
+  "edited": false,
+  "hash": "82beaadf9cb22548",
+  "intro": "Out past Urland the old road has gone strange: nothing walks it now but clawed tracks shaped like a man's. They lead to Hermgaard, a ruined village with dark stains across its smithy floor, and the village hides the Underdark's entrance, open once again. Past webs and a cold cavern where something breathes deep, the gates of Nearbealum glow soft green. They say a long journey there rewards veterans with trinkets. Not for the untried.",
+  "teaser": "A ruined village hides the Underdark's open door, and a green-glowing dark-elf city below."
+ },
+ "d2:deadl1": {
+  "edited": false,
+  "hash": "4541027ef0eb20c1",
+  "intro": "Past the moor the road gives out into the Death Swamps, where the air hangs so thick you fight for every breath and the smell of death never lifts. Zombies stagger between the quagmires, and a ghoul goes looking for corpses. Novices cut their teeth here, but sail the misted mere and the tomb and islands ask more of you. And mind the spirit lingering in the air: only the mightiest should cross it.",
+  "teaser": "Choking swamp air, staggering zombies, and a misted mere that leads to a tomb."
+ },
+ "d2:deathlink": {
+  "edited": false,
+  "hash": "ac3cb007365ccc0f",
+  "intro": "Go out through the south gate of Khorsabad, past the felled trees, and look for the old road under the oaks. The brambles there are dead, and you'll swear something lurks behind the trees. Beyond lies Sanctuary, its white marble streets lined with ivory and bronze busts, where the carpenter is forever working on another coffin and the mortician is glad to sell you one. Only the mightiest should go.",
+  "teaser": "Past Khorsabad's gate, a marble city where the carpenter never stops building coffins."
+ },
+ "d2:demon_realm": {
+  "edited": false,
+  "hash": "df9a6dd1932a26e1",
+  "intro": "Red sand burns over barren ground here, the flames swaying always the same way, as if some power moves them. Cross the bridge over the abyss, where something stirs far below, and you reach Tsaar, a village lit only by a vast vortex overhead, its shops still kept by ghosts. They say a long journey to gather lost things ends in a trinket. Come seasoned; Ishlor's castle is for the mightiest alone.",
+  "teaser": "Ghosts keep shop in Tsaar, lit only by a vortex, beyond sands that burn."
+ },
+ "d2:desert": {
+  "edited": false,
+  "hash": "6e65c50a8b844b78",
+  "intro": "Between Khorsabad, Xiyang and the Garden of the Gods lies the Gaumbi, and nobody crosses it lightly. By day the sun scorches the sand; by night the cold cuts to the bone. Sand worms roam everywhere, munching up everything in their path, and some of those cacti at the foothills are hungrier than they look. Find the oasis if you can. Only the mightiest come back with stories.",
+  "teaser": "Scorching sun, bone-cutting nights, and sand worms that eat everything in their path."
+ },
+ "d2:dwarves": {
+  "edited": false,
+  "hash": "095b9435a0ea7fb3",
+  "intro": "Fortress Farginok is a dwarven hold where the wise King Baldin sits on a throne of deep mahogany, brought from across the great ocean. Behind the throne room a narrow stair drops into darkness, and from down there you can hear the sounds of mining. The ghost of King Thorigorn is in that fortress too. They say there's a riddle of many small favours there, and it guards precious armour. It's a place for seasoned travellers only.",
+  "teaser": "A dwarf king's mahogany throne, a ghostly king, and mining sounds rising from the dark."
+ },
+ "d2:elfdom": {
+  "edited": false,
+  "hash": "63e3f48ae4560d1d",
+  "intro": "Beyond Haon-Dor Forest lies a valley where the river starts out gentle, then turns wild and sweeps everything it carries toward a waterfall. Up in the trees, rope bridges join small wooden houses, and past the royal guard, Elshar the elven king holds court. People speak of a silver dragon sunbathing there, and of a white unicorn that just stands and gazes back at you. Novices find their footing here; the seasoned find their match.",
+  "teaser": "A river that turns wild, rope bridges in the trees, and a sunbathing silver dragon."
+ },
+ "d2:etznab": {
+  "edited": false,
+  "hash": "2e7a2b05e1908e8c",
+  "intro": "Step out of Midgaard's south gate and the moss starts at your boots. Go deep enough and the trees crowd so close you can't see a few paces ahead, while a dark fog slides around your feet though no wind blows. A timber wolf watches you from behind a bush. Over the creek sits a tree house with a strange smell. Novices will manage the edges, but the deep woods want some experience.",
+  "teaser": "Just past Midgaard's south gate, a fog moves through the deep woods with no wind."
+ },
+ "d2:farm": {
+  "edited": false,
+  "hash": "7850a09ee2f189a2",
+  "intro": "Near Torsbay, a twisting trail through the wood opens onto a small farm, all rich soil and sweet air. Pleasant, you'd think. But out there the pumpkins wave their vines at you, the strawberry plants thrash their leaves, and a huge apple tree towers far above your head. Bertil, a muscular farmer, tends his fields as if nothing's amiss. Only the mightiest should go poking among those rows.",
+  "teaser": "A sweet-smelling farm where the pumpkins wave their vines and the strawberry plants thrash."
+ },
+ "d2:farm1": {
+  "edited": false,
+  "hash": "514ec26b01ce175e",
+  "intro": "Follow the wide dirt road out into the country and you'll find a farm so tidy it's almost unsettling. The windows shine, the porch is swept, and pumpkins and strawberries grow behind a high wooden fence. Piglets play in the mud and fat hens sit on their nests. Somewhere among them, a mad cow twitches uncontrollably. Don't let the crisp air fool you, friend. Only the mightiest walk those fields and come home.",
+  "teaser": "A spotless country farm where a mad cow twitches among the hens and piglets."
+ },
+ "d2:fields": {
+  "edited": false,
+  "hash": "ba76734dd6ee14e1",
+  "intro": "Between a black castle and a white one lies ground so blackened that nature herself gave up on it. Only tiny red flowers grow there, their leaves beaded with what looks like blood, and a faint wailing drifts over the broken spearheads. It began with a prince who never came to his wedding. Knights on black and white stallions keep the feud alive. Go seasoned, friend; some there would trouble the mightiest.",
+  "teaser": "Blood-dewed flowers bloom between two castles, where a wedding that never happened became an endless war."
+ },
+ "d2:foothill": {
+  "edited": false,
+  "hash": "fd9a4bc3f87b90ea",
+  "intro": "Walk west out of Nymgaard and the city's racket fades between rocky foothills. The bards camp out there, their tents set round a glowing fire pit. There are no gate guards, yet the place feels safe. Further on, a hermit called Marmack sits whittling his staff, and a narrow cave opens onto a bottomless cavern. Somewhere in those hills liger cubs play while their father watches. It's good country for a new blade, or for one still finding its edge.",
+  "teaser": "A bards' camp round a glowing fire, and a cave above a bottomless dark."
+ },
+ "d2:forest": {
+  "edited": false,
+  "hash": "5b6b244577956c55",
+  "intro": "You've heard of the killing fields? Blanche and Noir were friends once, until a prince vanished on his wedding day and his princess turned his golden dagger on herself. Now they bleed each other whenever they meet. Yet steps from the slaughter, white birches stand untouched and birds still sing. Below the castle wall the moat runs blood-red, and a crocodile stares back. Wolves for the green; the water for the seasoned.",
+  "teaser": "Two kingdoms at war over a vanished prince, and a moat running blood-red."
+ },
+ "d2:garden": {
+  "edited": false,
+  "hash": "140fa35d1b3627d5",
+  "intro": "Deep in the dry arain desert, a lush garden grows like a mirage: grass soft as carpet, water flowing close by, and a court of black marble so silent you'll find yourself whispering. Folk call it the Garden of Time. A stair of clouds climbs above it, and a hall of mirrors shows the fleeing armies of kings forgotten. Only the mightiest walk there. They say it ends the longest of long journeys, with a reward.",
+  "teaser": "A garden blooms in the desert, where time seems endless and the mighty go to rest."
+ },
+ "d2:gazha": {
+  "edited": false,
+  "hash": "1984a9783cdef2a8",
+  "intro": "Follow the river to Gazha, if you can stand the stink: the water runs dark as night and thick with dead fish. Beyond it lies an old world of long-forgotten intrigues. Somewhere south of its tower stands a castle whose element master was framed by his advisors. In the catacombs, screams of horror come from every direction. They say a restless soul wants a favour. Go only if you are among the mightiest, and never alone.",
+  "teaser": "A black, dead-fish river leads to Gazha, and a castle where an element master was framed."
+ },
+ "d2:gnome": {
+  "edited": false,
+  "hash": "68f10fbbf707a6d8",
+  "intro": "Southwest of Urland, past a path the brush has nearly swallowed, the gnomes stayed after the war and rebuilt; the halflings didn't. You'll walk between mounds of wreckage that stand like monuments, then go down into a mine where light comes through a vein of quartz and the miners eat their lunch in its glow. They say lost things there want finding, and a dark trial tests veterans. Only the mightiest should go.",
+  "teaser": "Where the war's wreckage stands like monuments, gnomes still dig deep beneath the earth."
+ },
+ "d2:gobtown": {
+  "edited": false,
+  "hash": "6c8cf3ec48b7ec41",
+  "intro": "Past the singing birds of the Etz-Nab woods lies a labyrinth of green hedges grown so wild you can barely see the path. Some goblin hedge clipper is meant to tend it. The dead leaves crunch underfoot until the crunching turns into laughter, and the hedges mock you without making a sound. Somewhere a roar shakes them. Beyond it all stand the gates of a goblin city. Only the mightiest should go looking for them.",
+  "teaser": "A hedge maze where the dead leaves laugh, and goblins wait beyond."
+ },
+ "d2:gobtown1": {
+  "edited": false,
+  "hash": "17383b4a40693f8c",
+  "intro": "Past the goblin labyrinth lies their city, and you'll smell it before you see it: trash heaped along Fear Street and Death Road, weeds splitting the cobbles, and dozens of goblin eyes that seem to watch from every shadow. In the little cemetery the gravestones lie overturned, a grave robber digs, and a goblin skeleton lingers, kept from its rest. Strange, then, that Catlin's Candystore smells so sweet. Go only if you're among the mightiest.",
+  "teaser": "A filthy goblin city where the graves lie open and the candy smells sweet."
+ },
+ "d2:hades1": {
+  "edited": false,
+  "hash": "2a41e884c491764f",
+  "intro": "Your curiosity may cost you dearly here, friend. The first plane of hell is all caverns and fissures and brilliant red soil. The heat is past bearing, small fires burst from the ground at your feet, and moans and shrieks come from every direction. A gate of fire bars the way in. Beyond it, disgusting Lemures slide across the floor towards you, and Erinyes, the Collector of Souls, is there too. This place is for the seasoned only.",
+  "teaser": "Red soil, bursting fires and endless shrieks: the first plane of hell is waiting."
+ },
+ "d2:hades2": {
+  "edited": false,
+  "hash": "29dde61f7eff2f55",
+  "intro": "You get in the hard way, by falling, and the first thing you see is an old skeleton slumped over a large dagger. Then the heat reaches you. The walls glow red and move in a way you can't stop watching. The floor bubbles, yet it holds you. Further in, the Minotaurs sleep among bones and hair. Only the mightiest walk out again.",
+  "teaser": "Glowing red walls, crawling tar, and Minotaurs who don't want company. Only for the mightiest."
+ },
+ "d2:hades3": {
+  "edited": false,
+  "hash": "0cb3e58f864b5947",
+  "intro": "Drop into the third plane of Hell and, with luck, a corpse breaks your fall. Fires spit from cracks in the ground. The walls bear deep scratches, the rock melted as if by a devil's acid. Far to the west, something shrieks. In craters of flame, a tail swirls now and then. And the dragon Ananta lies among bones old enough to make you wonder how hungry she is. Only the mightiest should come here.",
+  "teaser": "A corpse breaks your fall, and a hungry dragon lies among old bones."
+ },
+ "d2:hades4": {
+  "edited": false,
+  "hash": "09dd7bfdedacc71d",
+  "intro": "Step through a black arch blazing with colour, and the world beyond it drains to grey. This is the Shadow Plane. The ground feels barely there beneath your boots, and shapes flit through the fog just past seeing. Shadow knights float there, and beasts of shade prowl. Somewhere in the haze stands a castle of grey and black, its ebony doors unmoving. Go only if you count among the mightiest.",
+  "teaser": "Beyond a blazing black arch lies a grey land of fog, shadow knights and a sealed castle."
+ },
+ "d2:hades5": {
+  "edited": false,
+  "hash": "65c524d7697c3a94",
+  "intro": "Go down past the plane of shadows and you reach a charred black shore beside a lake of fire. Somehow the flames don't burn you. Out in the middle a small island glows. Someone has carved a warning into the rock: Adventurers Beware! They say the evil lord Asmodeus grins down there, and only the mightiest should go. They also say a long and perilous journey ends with a mighty weapon.",
+  "teaser": "A lake of fire that doesn't burn, a glowing island, and a warning cut in stone."
+ },
+ "d2:hades6": {
+  "edited": false,
+  "hash": "724476d83c96fb06",
+  "intro": "Go deep enough into the planes of Hades and you'll come to a ledge barely wide enough to pass, at the edge of the Abyss. The wind freezes your marrow and the screaming never stops. Vasslius the Soul Slinger throws souls over the edge, and the soul eaters below devour them as they fall. Only the mightiest climb down there. They also speak of a long journey for veterans, rewarded generously.",
+  "teaser": "A howling pit in Hades where souls are thrown down and devoured as they fall."
+ },
+ "d2:hades7": {
+  "edited": false,
+  "hash": "509f434b356ed567",
+  "intro": "Deep in Hades lies the seventh plane. The souls who loved the material over the spiritual pay for it there, and their wails sound less like agony than sorrow. Misers are lost in buzzing clouds of insects. Imps cram food into gluttons at a grand banquet table. The faithless stare forever at a glorious City they cannot reach. King Epicures rules over them all. Don't you go unless you're among the mightiest.",
+  "teaser": "Where the worldly damned weep, and a glorious City shines forever out of reach."
+ },
+ "d2:hades8": {
+  "edited": false,
+  "hash": "1890d76da621e8fb",
+  "intro": "Down on the eighth plane of Hades, every sin has a torment made to fit it. Liars wade through manure, sunk as deep as they once deceived. Slanderers scratch at an endless itch with fingernails as sharp as their tongues were, while gremlins cackle and wave flaming knives. Beyond it all, a door coated in pure gold gleams invitingly, and an elven witch scowls before it. Behind that door lies Queen Jezebel's lair. Only the mightiest should go.",
+  "teaser": "Liars wade through manure here, and a golden door guards Queen Jezebel's lair."
+ },
+ "d2:hamlet": {
+  "edited": false,
+  "hash": "0cf76343be430a1b",
+  "intro": "North of the Udgaard watchtower, a dirt path runs between post-and-rail fences into farmland. Alvin Miller toils at his millstone, his clothes white with flour; the Butchers are busy killing pigs. Past the corn, where stalks close overhead and you lose your bearings, a forest trail runs down to a slow stream and a bridge. It's gentle ground for newcomers, though Crazy Jake the prospector wanders about mumbling. They say a beginner's favour earns a trinket.",
+  "teaser": "Flour-dusted millers, corn that swallows the path, and a mumbling prospector north of Udgaard."
+ },
+ "d2:haunted": {
+  "edited": false,
+  "hash": "8aab9addd864113f",
+  "intro": "Past Cypress Forest the trees grow so old and vast that no wind stirs beneath them. Yet things move there: a translucent deer grazes, and a spectral raccoon stumbles by. Beyond a stone wall lies a village its people left long ago, and still, in the mansion, the Lady Kirrina entertains her guests. Go if you've some experience. But somewhere lies a dragon's lair, and that is for the mightiest alone.",
+  "teaser": "A windless forest of ghostly beasts, an empty village, and a lady still hosting guests."
+ },
+ "d2:hills": {
+  "edited": false,
+  "hash": "8cc4bbe22f3eb246",
+  "intro": "North of Midgaard II, the muddy path climbs into the Drabar Hills, and the hills have a hive in them. Down its tunnels the giant ants keep a larder of half-eaten corpses, and deeper still their Queen lays her eggs among the bones. Up top, a pair of hill giants keep a cave with a card table, and far below it all you'll hear rushing water. It's a fit place for novices with steady nerves.",
+  "teaser": "Giant ants hoard half-eaten corpses beneath the Drabar Hills, and their Queen lays eggs among bones."
+ },
+ "d2:ishlor": {
+  "edited": false,
+  "hash": "c763185824c7e2db",
+  "intro": "You'll find no torches in the castle of Ishlor the demon prince; the white marble walls glow on their own. His throne is pure gold, set with diamonds and rubies, and beside it lies a heap of chains meant for fearsome beasts. Three witches, of death, fire and frost, sleep within, and there is a room where monsters are made. Only the mightiest should cross that bridge.",
+  "teaser": "A demon prince's glowing marble castle, where three witches dwell and monsters are made."
+ },
+ "d2:isledead": {
+  "edited": false,
+  "hash": "2f1d5dc4a7f3fd4a",
+  "intro": "You step onto black sand that stinks of rotting flesh, and the evil of the place grabs you by the heart. South, ebony trees stand turned to stone; east runs the road to Sanctuary. Elsewhere, headstones march like rock soldiers over a sea of mist and blood, and Zock the Vampire King follows your every move with sunken eyes. Only the mightiest belong there. They say a favour leads to a riddle.",
+  "teaser": "Black sands, petrified trees and a Vampire King who never takes his sunken eyes off you."
+ },
+ "d2:keep": {
+  "edited": false,
+  "hash": "e52031365484d6a2",
+  "intro": "Hard by the Death Swamps stands a keep so old it's half ruin, and so quiet you'll hear your own pulse. In its hall hangs a tapestry: a Black Lich on a demon horse, driving the forces of good from Azhrgan. Urgnak the Black Lich rules there over his undead. A skeleton called Boney sells scrolls inside, mind. Only the mightiest go in, and most of what dwells there will come at you.",
+  "teaser": "An ancient, ruined keep where a Black Lich rules the undead and a skeleton sells scrolls."
+ },
+ "d2:lostlands": {
+  "edited": false,
+  "hash": "6bdae3b1acbad9fc",
+  "intro": "A landslide has torn the mountainside open, and below you lies a huge valley: teeming jungle, a slow river, smoke rising from fires, and a stone pyramid breaking through the canopy. A shaft drops into that pyramid, its walls wet with blood. A feathered serpent floats on a haze of smoke, and a tyrannosaurus fills the end of a gully. They say there's a rescue only the brave and swift will complete. Seasoned travellers only.",
+  "teaser": "A landslide has opened a jungle valley of smoke, blood-wet stone and a tyrannosaurus."
+ },
+ "d2:manse": {
+  "edited": false,
+  "hash": "4cf55c4538bc14e4",
+  "intro": "Follow the north road to a pair of polished steel gates: the mansion of Tobas, Wizard of Telven. Mind the stables. He keeps demon horses there, snorting fire, and the dents in the stall walls say they'd rather be elsewhere. Behind the stables, bums play craps in the acrid shadows. And the great Tobas himself? Last I saw, he was perfecting a spell to open jars. Seasoned travellers only, friend.",
+  "teaser": "A wizard's mansion of fire-snorting demon horses, dice-rolling bums, and a spell for opening jars."
+ },
+ "d2:midsewers": {
+  "edited": false,
+  "hash": "7fab2064e970287e",
+  "intro": "Someone found a forgotten way into the sewers under Midgaard's gates and market square. Climb down the rusty iron rings and you'll slosh through ankle-deep muck while voices drift through the grates above. Gray orcs keep house down there, one daubing talentless battle scenes on the walls, and coloured slimes ooze along the ground. They whisper of something stolen, worth a trinket, and a rescue only the brave complete. Go once you've some scars.",
+  "teaser": "Beneath Midgaard's streets, gray orcs and oozing slimes lurk in the stinking dark."
+ },
+ "d2:monk": {
+  "edited": false,
+  "hash": "417fa86f7f496913",
+  "intro": "South of Nymgaard the road narrows to dust and the air turns sweet with grapes. Follow the cart ruts through the vineyards to a plain gate, and you'll feel it: sacred ground. Carp crowd a pond under a large oak, the quiet is eerie, and a low humming comes from a stone building shaped like a cross. They say a perilous trial waits there, with a reward.",
+  "teaser": "Past sweet-smelling vineyards, a quiet monastery hums behind its plain gate."
+ },
+ "d2:moor": {
+  "edited": false,
+  "hash": "178d85acaaa7317c",
+  "intro": "Walk out the North Gate of Midgaard and the wagon road soon fades into stark, desolate moor. Foxes and ravens make easy company for a novice; the brigands, less so. Further on lies a marsh of tall grass where something is always rustling, a hut of leaves and twigs, and a cranky old witch. And if a weak light comes drifting toward you over the marsh, run. Only the mightiest stand against that.",
+  "teaser": "Beyond Midgaard's North Gate: brigands, a cranky witch, and a weak light over the marsh."
+ },
+ "d2:mount": {
+  "edited": false,
+  "hash": "fa5f23b4745b62ba",
+  "intro": "Walk north out of Urland until the town's noise fades and the ground turns to rock, then ice. Up there a savage yeti leaps from the snow, and a hollow in the ice is strewn with bones, fresh corpses and huge claw-marked tracks. Over the west side, though, a waterfall feeds a lake in a secluded valley where time almost stands still, and something unseen is laughing. Go only if you have some experience behind you.",
+  "teaser": "Above Urland, bones in the ice, and laughter drifting from a hidden valley."
+ },
+ "d2:neptune": {
+  "edited": false,
+  "hash": "596a6ee20861bb47",
+  "intro": "A pebbled path at the lake's edge doesn't stop; it walks straight into the water. Follow it down through icy darkness to the Merfolk Kingdom, where houses hang old spears like portraits of honoured ancestors, and a black wall seems to have a story to tell. Only the mightiest go, best in small company, and none linger under too long. They say a search for something lost ends in armour, for whoever sees it through.",
+  "teaser": "A pebbled path walks straight into the lake, down to the Merfolk Kingdom."
+ },
+ "d2:nymgaard": {
+  "edited": false,
+  "hash": "42c2ce5d18e9024a",
+  "intro": "Nymgaard is a proper city, friend. Paddle Tear Lake and you'll smell molten steel from a forge nearby. Step into the butcher's and she'll be working with an infant strapped to her back. There's a Fountain of the Gods in the market square, and somewhere ivory stairs darken to ebony as you descend. Novices walk safely there, though only the mightiest could cross its townsfolk. They say a dangerous hunt there pays in armour and gold.",
+  "teaser": "A lakeside city of forges and fountains, where ivory stairs darken to ebony."
+ },
+ "d2:ogre": {
+  "edited": false,
+  "hash": "526735bcae2062a5",
+  "intro": "Follow your nose to Moochan Tandor, city of the ogres; the stench of rubbish meets you at the gates. Inside, a fungus cavern steams underfoot while human, elf and dwarf slaves cut the crop beneath an overseer's whip. Elsewhere a seething mound of fungus and ogre flesh groans, birthing more ogres. Only seasoned blades should go. They say a dangerous hunt there rewards veterans with armour.",
+  "teaser": "Where ogres are born from groaning fungus, and slaves harvest it under the whip."
+ },
+ "d2:ogre1": {
+  "edited": false,
+  "hash": "2fc9e9be92b55060",
+  "intro": "Where Haon-dor forest gives way to Tandor Marsh, the mist hangs so still it might be painted on, and every footprint fills with water behind you. Somewhere beneath lie the tunnels of Moochan Tandor, lit green by fungus the Ogres farm. Take the steps cut into the rock and you'll hear cries of pain drifting up from below. Not for the green, friend. Seasoned hands only.",
+  "teaser": "Beneath a still marsh mist, Ogre tunnels glow green, and someone below cries out."
+ },
+ "d2:outxiyang": {
+  "edited": false,
+  "hash": "a71163162b4330aa",
+  "intro": "Out where the City of the Eastern Sun begins, a bronze arch over the Imperial barracks shows a phoenix and a dragon face to face. The Yellow River rushes past, and Boatman Yui sits on its bank selling rafts. Further on, the snow peaks open onto a valley red with cherry blossom, and in Huashan Temple the elders practise the sword and watch your every move. Only the mightiest belong there. Have a drink at Old Cheng's before you go.",
+  "teaser": "Cherry blossom under snow peaks, and sword masters at Huashan who watch your every move."
+ },
+ "d2:reslab": {
+  "edited": false,
+  "hash": "83d2df3b3ad6fd9d",
+  "intro": "Take the old canyon road south of Midgaard, travelled daily by city folk, and you'll reach the Laboratory, where they work day and night on new spells and weapons. Mind the mutated rabbit, and mind the janitor more: he drools between fits of fanatical scrubbing, and won't wait to be introduced. Best for those with some experience. They say a long journey sets something right, and a favour for the deserving pays in armour.",
+  "teaser": "South of Midgaard, inventors toil day and night while an insane janitor scrubs and drools."
+ },
+ "d2:rotten": {
+  "edited": false,
+  "hash": "c1f7a50d469300d2",
+  "intro": "ThorBardin was a dwarf city, forgotten after the great war and left to decay. Bandits claimed the ruins until the law won them back, and folk find that law a bit corrupt. Eyes watch from the shadows of its deserted streets, and in the square a statue of Shar, Queen of Mischief, stretches out an arm with a rope tied to it. They say a hunt for something lost pays in armour. Seasoned travellers only.",
+  "teaser": "A forgotten dwarf city of bandits, crooked law, and a rope on Shar's arm."
+ },
+ "d2:sands2": {
+  "edited": false,
+  "hash": "dade0b84e3c8a98e",
+  "intro": "Past Baardek Beach rise the high black walls of Baardek Keep. The gates swing without a sound and only whispers come out. Spies live there, watching all of Valhalla, and you'll swear someone is looking over your shoulder. Eros rules the place, but they say Silk, mother of lies, may be the deadlier. Somewhere inside, a charred ivory path hangs over lava whose flames give off no heat. Only the mightiest should go in. They say a long journey there ends in a powerful weapon.",
+  "teaser": "Spies behind silent black gates, and a path over flames that give no heat."
+ },
+ "d2:sandzone": {
+  "edited": false,
+  "hash": "95cbe3ca849edc94",
+  "intro": "Where the Baardek forest thins, you'll catch a salty tang, then the beach: a long strip of sand under cliffs like walls of smooth granite. Extremely large crabs throw sand about, and killer kelp slurps along the shore. Up top, the Cheleho skin their pelts round a crackling fire pit, their men looking lost and defeated. Seasoned travellers only. They say a hunt ends in a blessing, and a long journey in a powerful weapon.",
+  "teaser": "Killer kelp, giant crabs, and a cliff-top tribe skinning pelts by the fire."
+ },
+ "d2:seren": {
+  "edited": false,
+  "hash": "46bfd92fa9ae98a5",
+  "intro": "South of the Etz-Nab woods, a ridge looks down on the Valley of Serenity, all that remains of the goodness the old elves brought. Deer graze its meadows, and a guardian Zoat named Zolan stands in the forest. Go south and mist gathers on the Lake of Remembrance, where you sail over an ancient darkelf city. They say a long search for precious things ends in armour. Only the mightiest should try.",
+  "teaser": "Mist on the Lake of Remembrance hides an ancient darkelf city beneath your boat."
+ },
+ "d2:seren1": {
+  "edited": false,
+  "hash": "c812f7e1eecdacf6",
+  "intro": "Deep in a forest, past the Valley of Serenity, the Temple of the Coven keeps its altar to Odin. One cell holds four bed frames; only one has a clean mattress. An elf traveller watches newcomers, saying nothing. And some swear they've stood on a thin layer of cloud, blue sky above, the forest far below. They say a long journey there rewards veterans with armour, or a trinket. Only the mightiest should go.",
+  "teaser": "A forest temple to Odin, a silent elf, and cloud that holds your weight."
+ },
+ "d2:skaven": {
+  "edited": false,
+  "hash": "2da3546bec080e37",
+  "intro": "Up in the mountains, a cave mouth breathes a stench you'll taste for days. Inside, the rat-folk of chaos dig ever deeper, praying to the Horned Rat, the Plague God, and brewing their dark ale. Fires smoke beneath a ceiling lost in gloom, where a plague monk drools and spits into the flames. They whisper of a long journey ending with a mighty weapon. Go only if you number among the mightiest.",
+  "teaser": "Rat-folk of the Plague God dig ever deeper beneath the mountains, brewing dark ale."
+ },
+ "d2:talen": {
+  "edited": false,
+  "hash": "f44bef5aba90c763",
+  "intro": "West of Nymgaard's bustle the trees close in, and the forest itself fights you: vines at your ankles, branches at your face, beady red eyes watching from crevices. Push on and you'll find a lake so clear you can count the fish, a wemic guarding his pride, and a cavern where crystals scatter tiny rainbows. They say a search for something precious ends in a trinket. Good country for novices and those finding their feet.",
+  "teaser": "A forest that fights back, hiding a crystal cavern full of tiny rainbows."
+ },
+ "d2:tiamat": {
+  "edited": false,
+  "hash": "a42eba53445b27e4",
+  "intro": "There's an opening in the Mountains where the path drops steep and treacherous into the rock. Below, the tunnels drip with groundwater and stink of worse, until the stone opens on a temple carved from the mountain itself, two statues of ancient dragons standing among its pillars. Beyond lie caves walled in ice or lit by a soft blue glow, and the shrine of Tiamat, Queen of all evil dragonkind. Only the mightiest should take that path.",
+  "teaser": "Beneath the Mountains, a rock-carved temple guards the shrine of Tiamat, Queen of evil dragonkind."
+ },
+ "d2:torsbay": {
+  "edited": false,
+  "hash": "8ecf64a66e61f595",
+  "intro": "Take the New Road south under Tor's Gate and you'll smell the brackish bay before you see it. The pride of Midgaard's fleet rides at the docks there, and the Harbor Master will sell you passage to other places. Drink in the smoky pub up on its pilings, with nets on every wall, and mind the smuggler peddling his goods. Somewhere out there stand an abandoned lighthouse and a rotting wreck that scavengers dig through. It's for seasoned hands only.",
+  "teaser": "Midgaard's great ships, a smoky pub on pilings, and an abandoned lighthouse by the bay."
+ },
+ "d2:tower": {
+  "edited": false,
+  "hash": "093e63ca286a2178",
+  "intro": "Past ancient, near-dead trees hung with a few black leaves, the Kithyrn Tower rises over a trail long untended. Inside, orcs pick through the debris while elves keep their quiet rooms, and somewhere a fountain spills over three tiers of white stone. Beneath it all, a blue glow thickens. It suits those with some experience. They say there are errands and trials there, the last rewarded with armour or a trinket.",
+  "teaser": "An elven tower in a dying, black-leaved wood, where orcs root through the debris."
+ },
+ "d2:toy": {
+  "edited": false,
+  "hash": "b191b6547b8333f4",
+  "intro": "Near the Haon-Dor Forest there's a cottage with stained-glass windows and no door at all. People who've been inside swear they were no bigger than a mouse in there. They talk of shelves where toys walk and gossip, a marionette that pulls his own strings, and dust bunnies that stare back with glowing red eyes. They say someone there wants precious things found, and pays in a trinket. It suits those still new to the road who have a few fights behind them.",
+  "teaser": "A cottage with no door, where the toys walk, talk and pull their own strings."
+ },
+ "d2:trees": {
+  "edited": false,
+  "hash": "75c0314afd7078ea",
+  "intro": "Walk the Mystic Forest and you'll think it gentle: gnarled oaks hung with ancient moss, a waterfall spilling from a hill into a clear pool. Then a dark cave whose strange light tries to push you out. Below it, drow keep dwarf slaves sweating at a red-hot forge, and beneath an underground lake lives something telepathic. Fit for novices and those with some experience. They say a dangerous hunt there pays in gold and more.",
+  "teaser": "Mossy oaks and a waterfall above; drow, slaves and a telepathic horror below."
+ },
+ "d2:udsewer": {
+  "edited": false,
+  "hash": "422ac22340142420",
+  "intro": "Climb down the rust-crusted ladder and the stench hits you like a fist. Udgaard's sewers are older than its guilds, fine stonework carrying black, oily muck. Huge rats nest beneath the food store, one of them looking quite important, and trash-gobbling creatures root through the filth. A soft green glow shows to the west. They say something was lost down there, and a trinket goes to whoever finds it. Fit for novices with strong stomachs.",
+  "teaser": "Beneath Udgaard, rats with royal airs nest in muck older than the guilds."
+ },
+ "d2:urland": {
+  "edited": false,
+  "hash": "73f5930465e73fec",
+  "intro": "Walk Kings Road to where the paving gives out and the Ratswharf stink fades, and you reach Urland, where folk meet your eye. The barmaids at the Prancing Pony would sooner rip your arms off than pour you a beer. The old horses in the pasture are smarter than they look. And Screeton the Grand Wizard babbles physics equations. They're peaceable folk, but only the seasoned should cross them.",
+  "teaser": "Surly barmaids, clever old horses and a babbling wizard where Kings Road ends."
+ },
+ "d2:vine": {
+  "edited": false,
+  "hash": "2a054b2e03a3200d",
+  "intro": "Past the monks' guild the vines grow taller than your head, and you walk the rows half blind. The scent of ripening grapes is so heady it'll make you dizzy before the wine ever does. Wooden crates wait along the paths for the harvest, tiny animal trails wind off through the leaves, and somewhere in there a small pixie will look you over impishly. Fair ground for novices and those just past them.",
+  "teaser": "Vines taller than a man, a dizzying scent of grapes, and an impish pixie."
+ },
+ "d2:volcano": {
+  "edited": false,
+  "hash": "d2b9002845d4ccf6",
+  "intro": "There's a small volcanic island on the sea, with a ledge round its flanks and a crack that breathes noxious fumes. Inside lies a lake of pure lava, and a large bird of fire they call the Phoenix. Deeper, an underground river opens onto a city, Danalek, ringing with picks and forge. They say a perilous hunt for something precious waits there, paid with a trinket. Bring some experience; its depths want seasoned hands.",
+  "teaser": "A volcano breathing fumes, a lake of lava, and a city beneath the stone."
+ },
+ "d2:warntz": {
+  "edited": false,
+  "hash": "714d96b1b5aa9c3b",
+  "intro": "Past the Zendar Hills lies the Warntz Forest, where the canopy swallows the sun, the trees stand scarred and clawed, and the air smells of death. Owlbears roam there, and you don't want to meet a mother guarding her young. Griffons perch on the Tarceanian peaks above. Mark me: only the mightiest should walk in. They say one long journey there reunites a family, and another restores justice.",
+  "teaser": "Clawed trees, a sunless canopy and owlbears guarding their young: only the mightiest should enter."
+ },
+ "d2:wcastle": {
+  "edited": false,
+  "hash": "31cbed6055b73194",
+  "intro": "Ask about the killing fields. Lanairia was to wed Burtonious on a cloudless summer day, but he vanished, leaving only hoofprints racing from the castle. She turned his own golden dagger on herself, and King Blanche has warred on King Noir ever since. Within the White Castle lies a Shrine of Sorrow. The stables are gentle enough for a novice; the guards and throne room are for only the mightiest.",
+  "teaser": "A vanished groom, a golden dagger, and two kingdoms bleeding ever since across the killing fields."
+ },
+ "d2:ww1": {
+  "edited": false,
+  "hash": "43ef145be91b0989",
+  "intro": "You'll smell the WightWarrens before you see them. Cave-wights live, eat, sleep and quarrel down there, and they leave the proof everywhere. Past the stinking tunnels, rock pillars stand as thick as a forest and twist your sense of direction. A swift river runs south, and its water seems to give off some great power, though it's thin there. Somewhere in the dark an Ur-Vile Loremaster barks the moment it senses you. It's no place for the greenest; bring some experience.",
+  "teaser": "Stinking cave-wight tunnels, a forest of stone pillars, and a river that gives off power."
+ },
+ "d2:ww2": {
+  "edited": false,
+  "hash": "bbc123e7785de963",
+  "intro": "Past the Wightwarrens, the stink gives way to stale air and strangely smooth black rock, as if centuries of evil had changed it. Ur-Viles sniff the air in their warrens, a Demondim bends over occult experiments, and a vast cavern glows red from a pit of fire that reeks of sulphur. Raw novices should stay away. If you've some experience, though, there's enough down there to test you.",
+  "teaser": "Black rock, sniffing Ur-Viles, and a cavern lit red by a pit of fire."
+ },
+ "d2:xiyang": {
+  "edited": false,
+  "hash": "5d9f17a8f7c00729",
+  "intro": "XiYang, the City of the Eastern Sun, is tiled in mother-of-pearl, and its glow soothes rather than dazzles. Ships under every flag crowd the harbour on the Sea of Fongyi, and two huge dragon gates rise to meet the sky. Seek out the dojo, where dried blood stains the floor and only the winner ever walked out. Bounty hunters stand about, waiting for a job. Go only if you count among the mightiest.",
+  "teaser": "A city of glowing mother-of-pearl, where only the dojo's winners ever walked out."
+ },
+ "d2:xiyang2": {
+  "edited": false,
+  "hash": "81ab0821d430ac5c",
+  "intro": "Walk the stone marble docks of Xiyang with the salt of the Sea of Fongyi in your nose, and you'll find a trireme where slaves man the oars while a slaver beats them. In the city rises a dull-red gatehouse six storeys high, with phoenix and dragon entwined upon it. In the palace courts, a wall shuts off charred ruins. They say there's an errand for those wanting a fresh start. Only the mightiest should go.",
+  "teaser": "A slaver's trireme at a marble harbour, and a burned palace ruin walled away."
+ },
+ "d3:arena": {
+  "edited": false,
+  "hash": "93e37873a5512660",
+  "intro": "Step off the square through the arched way and you'll hear it first: steel clattering, screams of honourable death, shouts of victory. Inside, the brown dirt runs darker where blood has soaked in. Fighters keep to coloured rings suited to their measure, blue for the greenest, red for the mightiest, yet the open ground turns no one away. There a novice might cross blades with a god. Read the red sign before you go in.",
+  "teaser": "Blood-soaked dirt, screams of honourable death, and open ground where novices may face gods."
+ },
+ "d3:assassin": {
+  "edited": false,
+  "hash": "2721bd75d32858ef",
+  "intro": "Off a street in an Arabian city lies the house of the Khorsabad Assassins, masters of quick and silent death. Its foyer stays full of shadow however much light burns, and you'd swear the place stands empty. It doesn't. Black-robed figures barely part from the dark, and charts of many monsters mark where the killing dagger goes. Only the mightiest should walk those halls.",
+  "teaser": "Shadowed halls where the Khorsabad Assassins teach quick and silent death."
+ },
+ "d3:barbarian": {
+  "edited": false,
+  "hash": "76fcb7d4a57625f9",
+  "intro": "Up on a high plateau stands a plain, rough hall that smells as you'd fear, and roars with revelry from the doors to Hilka's oaken table. Climb to the loft and you'll find a brazier burning red without warmth, a bloodshot eye hanging above it that follows you round the room. They say there's a trial there only the brave complete, paid in gold, and a long journey for something precious. Only the mightiest belong.",
+  "teaser": "Above a cold red fire, a bloodshot eye hangs in the air and watches you."
+ },
+ "d3:bounty": {
+  "edited": false,
+  "hash": "25ad96f9bf4ea381",
+  "intro": "Step off Kings Road into the shade of tall trees and you'll find a stone guild grown rich over generations. A man with a dark smirk waits in the shadows; a room of maps holds the contracts. Below, raw bedrock and a hallway of faces lead to a crypt I won't describe. They say there's an errand anyone can take on, and a trial only the bravest complete. It's ground for only the mightiest.",
+  "teaser": "Beneath a wealthy guild off Kings Road, a hallway of faces leads into a crypt."
+ },
+ "d3:clericguild": {
+  "edited": false,
+  "hash": "e012b53c6fd33144",
+  "intro": "Walk Tranquility Path to a whitewashed wall, and inside you'll find the followers of the Way of the Petal: a white marble monastery with its golden doors standing open, and an oak so vast its limbs roof the garden. Brothers chant softly while Sister Morenae broods on the evil of her past life. Every soul here is mighty beyond reckoning, the guard most of all. They say there's a hunt for beginners, rewarded with a trinket.",
+  "teaser": "White marble, golden doors, a vast oak: the healers' monastery, kept by the truly mighty."
+ },
+ "d3:cypress": {
+  "edited": false,
+  "hash": "e85252ec0abbfaad",
+  "intro": "Walk out past the West Gate of Midgaard and down the dusty trail, and the cypresses close in until you see the sky only in glimpses. Climb the hill there and you can just peek over the tree crowns. A wild black boar runs loose under the trees, and a badger noses around its burrow, but it's fair country for those new to the road. They say someone is searching for something lost, and that a weapon is the reward.",
+  "teaser": "Dense cypress woods west of Midgaard, a wild boar, and a rumoured reward for something lost."
+ },
+ "d3:druid": {
+  "edited": false,
+  "hash": "27de2d2cc4792199",
+  "intro": "Step behind the waterfall, where the only sound is water pattering outside, and you find a cavern lit green by magic. Trees grow there, thriving on that glow, along paths of soft moss. Further in, beneath a ceiling high as a cathedral, stands a ring of standing stones where the magic is thick enough to touch, one carved with glowing runes. Mind the old trees. Only the mightiest should think of raising a hand against them.",
+  "teaser": "Behind a waterfall, a green-lit cavern of trees and rune-carved standing stones."
+ },
+ "d3:fightersguild": {
+  "edited": false,
+  "hash": "5a411bfc5d11c77c",
+  "intro": "Off Swordsman Way, a portcullis of incredible dimensions guards the Fighters Guild. Inside the fortress walls no wind blows, and it's awfully quiet, except in the smithy, where an open furnace roars, fed by sprockets and running water. Sir Lancelot the Brave stands ready to face any opponent; Sir Robin just looks nervous. After, you drink with the mercenaries at The Broken Shield. Green swords and the mightiest alike train here.",
+  "teaser": "Behind a giant portcullis, knights, a water-driven forge, and a mercenaries' bar wait for you."
+ },
+ "d3:goblin_cave": {
+  "edited": false,
+  "hash": "75a5a7038ad32768",
+  "intro": "Past the Cypress Forest, goblins squat in a cave, still waiting for orders to take Udgaard and Midgaard. Nobody seems to remember them, so they steal from the locals instead. In King Burp's hall the food crawls across greasy tables, his cleric agrees with every word, and a fool entertains. The cook's pot holds something like spinach with eyes. If you're new to the blade and have a strong stomach, go.",
+  "teaser": "Forgotten goblins, a king named Burp, and dinner that crawls off the table."
+ },
+ "d3:gremlin": {
+  "edited": false,
+  "hash": "4ed64bf3f69e6a26",
+  "intro": "Take the dusty trail west of Midgaard north to Barnham's farm, where a crow exults over some trinket in the corn. Gremlins have overrun the place. Follow the trampled path into the hills to a cave breathing a cool, acrid draft, where feet slap in the dark and grumpkins glare back. Good ground for newcomers finding their feet. They say there are errands to run, and a rescue that ends in a search.",
+  "teaser": "Gremlins have overrun Barnham's farm, and something slaps its feet in the cave beyond."
+ },
+ "d3:halfzon": {
+  "edited": false,
+  "hash": "876767b1e5e5e8c5",
+  "intro": "Halflings built Tassel Grove after the great wars, trusting their Goddess Sierablem to shield the generous from the world's evil. The fire tender stares into the glowing town pit, a three-storey windmill grinds as its blades turn, and a sly thief eyes your possessions. They say an errand there wants two helpers and pays in a trinket. Gentle enough for novices and those with a little experience.",
+  "teaser": "Halfling farmers, a grinding windmill, and a sly thief eyeing your possessions."
+ },
+ "d3:haon_dor": {
+  "edited": false,
+  "hash": "0a221f453f5e8392",
+  "intro": "West of Udgaard, Haon-Dor starts kindly enough: rabbits, deer, a log cabin where, they say, a beginner can find an errand. Walk on and the old crowns close into an unreal twilight. Beyond, ancient grey trees seem to watch you pass, and some walk on giant roots. In that dark a green dragon's narrow yellow eyes glow with rage. Novices turn back there; the deep forest belongs to the mightiest alone.",
+  "teaser": "West of Udgaard, the trees grow older, greyer, and some of them walk."
+ },
+ "d3:hobgob": {
+  "edited": false,
+  "hash": "89421d4562028325",
+  "intro": "Deep in the mountains, the hobgoblins run a prison town with an iron fist. Thieves, murderers and the mad work the mines until they collapse, and now and then a healthy traveller like you joins them. Screams echo down the tunnels, and the catacomb niches are stuffed four and five bodies deep. Leave it to those with some experience. They whisper of a long journey to restore something precious, richly rewarded.",
+  "teaser": "Hobgoblin jailers work thieves, murderers and madmen to death in mines deep in the mountains."
+ },
+ "d3:kingc": {
+  "edited": false,
+  "hash": "e3af8f3c48b78d0e",
+  "intro": "Beyond Midgaard City stands King Welmar's Castle. The roof of its Great Hall is so high it seems as far off as the clouds. The wise king sits on a throne carved from one block of ivory, so think about the beast that gave it. Below, the stairs turn plain and prison-like, and something with tentacles stirs in a dark, deep pool. They say a search for something precious is rewarded with a blessing. Fit for novices and those with some experience.",
+  "teaser": "An ivory throne above, a prison below, and tentacles stirring in a dark pool."
+ },
+ "d3:knight": {
+  "edited": false,
+  "hash": "5b640e3b50224ff3",
+  "intro": "Step in from the Midgaard Sewers to a little mud room, its floor lined with drains. Beyond it is a passage where the torches burn but give hardly any light, and then a hall whose ceiling is lost in darkness. There the Dark Knights sit at great tables, talking over the goodness they've purged. Crossing blades with them is for the mightiest alone. Still, they say there's a favour for beginners, paid in a weapon and a trinket.",
+  "teaser": "Past Midgaard's sewers, the Dark Knights gather to talk over the goodness they've purged."
+ },
+ "d3:mageguild": {
+  "edited": false,
+  "hash": "e5e41af15a4060cf",
+  "intro": "Just south of Cathedral Square, a combat mage keeps the gates of the College of Arcane Arts, home of Midgaard's Conjurers. Inside, the more magical books hum on their shelves, and one tower's walls are blackened by intense training. Seasoned folk find their footing here; only the mightiest would cross that gatekeeper. They say newcomers who do a favour leave with a trinket, while others journey far to earn back something lost.",
+  "teaser": "Behind a combat mage's watch, Midgaard's Conjurers keep humming books and scorched tower walls."
+ },
+ "d3:midgaard": {
+  "edited": false,
+  "hash": "0ff01822d89a44b2",
+  "intro": "Midgaard is the great capital, friend, and there's more to it than shops. Stand in Cathedral Square under the great grey tower. Then find the room where the janitors heap everything the city has lost. Filthy will pour you a special drink, and Marty the Mortician will only smirk softly. They say a search for something precious earns a trinket, and a favour earns a blessing. Novices find their feet here, though the guards could humble the mightiest.",
+  "teaser": "In the great capital, lost things pile up and the Mortician smirks softly."
+ },
+ "d3:midwalls": {
+  "edited": false,
+  "hash": "5a15b28c13f22ec0",
+  "intro": "You've walked under Midgaard's walls a hundred times, but have you been up on them? Up there the wind whips across the wall walk and you can barely hear the city. From the southwest tower the land stretches for miles beneath the city's banner. The guards keep their own tavern, the Stone Tankard, and their captain, George, sits behind his desk. They're civil enough, but only the mightiest should test them.",
+  "teaser": "High on Midgaard's wind-whipped walls, the guards drink in a tavern of their own."
+ },
+ "d3:necro_guild": {
+  "edited": false,
+  "hash": "31e81910e16c557f",
+  "intro": "There's a church burned down to molten rock, yet its tapestries hang undisturbed, masterpieces every one. Stand in the dim light and you'll hear faint chanting. Below the marble altar, fresh corpses lie battered on catacomb shelves, a great Varac wolf stands guardian, and Wicca the Tainted One rules the Necromancers. A ghostly raven won't trouble a novice; the rest is for the mightiest alone. They say veterans find an errand there, ending in a powerful reward.",
+  "teaser": "A burned church, faint chanting, and a guild of Necromancers beneath the altar."
+ },
+ "d3:newbie": {
+  "edited": false,
+  "hash": "d536f1bb576f003c",
+  "intro": "Before you set foot anywhere else in Udgaard, stop at the council hall, where newcomers sit and wait their turn with a guide. Off it run offices kept like trophy rooms: a stuffed griffon with its claw flung out to snatch, two ravens perched on a chair by the fire, dragon scales of many colours on the walls. Nothing there bites, friend. And they say a guided errand ends with a weapon in your hand.",
+  "teaser": "Newcomers wait for a guide here, among stuffed griffons, ravens and dragon scales."
+ },
+ "d3:offices": {
+  "edited": false,
+  "hash": "8a89f731153ef9b7",
+  "intro": "Climb the stairs above the Chicken's Rest Inn and you'll find a mahogany-panelled hallway with a small sign over every door. Behind one, the Valhalla Times keeps its office: dark oak, big gold letters, and a black carpet that'll make you wonder why. Behind another, blueprints bury a desk whose lone chair I doubt anyone sits in. Nothing up there bites, though mind the torches among all that loose paper.",
+  "teaser": "Above the Chicken's Rest Inn, a newspaper office hides behind gold letters and black carpet."
+ },
+ "d3:paladin_guild": {
+  "edited": false,
+  "hash": "b0a8b57d769e013a",
+  "intro": "Just past the Cathedral square, behind raised portcullises, the Holy Knights of Midgaard keep their yard, watched over by a statue of a man struck down in battle. In their shrine a snow-white sarcophagus lies beneath stained glass, and marble stairs descend to older stone from before the sacking, where candles burn behind windows facing packed dirt. They say there's a trial for the righteous, rewarded with a weapon. Only the mightiest belong.",
+  "teaser": "A paladins' shrine with a snow-white tomb and stairs into Midgaard's buried past."
+ },
+ "d3:ranger": {
+  "edited": false,
+  "hash": "e1d17286bf9dc00f",
+  "intro": "Follow a well-hidden path through foliage that grabs at your feet and you'll find rangers camped in an open field for the great Equinox Festival. Someone tends their bonfire so it never goes out, and in their barn wild beasts share the stalls with tame ones and never fight. One tent is stranger still: larger inside than out. It's company for only the mightiest, and they say a trial for the bold is rewarded handsomely.",
+  "teaser": "Rangers gather for the Equinox Festival, where wild beasts and tame share one barn."
+ },
+ "d3:ratswarf": {
+  "edited": false,
+  "hash": "df2bcae6832d0c61",
+  "intro": "East of Midgaard's gate, a road runs between rocky hills to Ratswharf, a small port where slaves are bought and sold. Figures watch you from the hilltops: Elves camp on one, hobgoblins on another, and war could break out any moment. Beyond lies a dragon turned to stone. Climb down its throat, past rainbow-hued stalagmites, to a heart where old fires still smoulder. Good for novices; its depths want those with some experience.",
+  "teaser": "A slavers' port on the brink of war, and a stone dragon you can walk inside."
+ },
+ "d3:rebirth": {
+  "edited": false,
+  "hash": "9888fbe9e88d9ec4",
+  "intro": "In Cypress Forest there's a glade where the trees have stepped back into a circle and the wind holds still, as if the place is waiting. Follow it far enough and you'll walk a corridor of white fluted columns with nothing at all beyond the edge. Out there, in a cold dark, a flame burns on a raised plinth. This is where the sacrifices are made. What they buy, I couldn't tell you.",
+  "teaser": "A still glade, a corridor over nothingness, and fires where sacrifices are made."
+ },
+ "d3:sorcerer": {
+  "edited": false,
+  "hash": "7ecccf2aa5e89b16",
+  "intro": "Walk past the dust and stone blocks of Midgaard's half-built tower and you'll find a cave mouth jutting from its wall. Odd place for a cave, you'd say. Follow the chanting through low, dark passages and the mist thickens until it swirls like a whirlpool with nowhere to drain. Mist Dwellers hover in that fog. Only the mightiest belong there, though they say it holds a perilous journey for the bold, with a reward.",
+  "teaser": "Behind Midgaard's unfinished tower, chanting calls you into caves of swirling mist."
+ },
+ "d3:thievesguild": {
+  "edited": false,
+  "hash": "80d991248f1a7558",
+  "intro": "Beneath Midgaard, in an abandoned bar off a dark alley, a staircase drops into wine cellars cut from the virgin rock. Down there Marie pours behind a low counter while a musical box plays, ropes hang wall to wall for tightrope walking, and paintings of renowned criminals watch over a warm fire. Only the mightiest would cross the hooded figure guarding the stairs. Still, they say newcomers can run an errand and earn a weapon.",
+  "teaser": "Under an abandoned Midgaard bar, the thieves drink, train and guard their cellars."
+ },
+ "d3:udgaard": {
+  "edited": false,
+  "hash": "4cfbe710f78e404b",
+  "intro": "Most of us took our first steps in Udgaard, friend, and it's still the gentlest place I know to begin. Climb the wooden watchtower and you'll see the whole village, the Haon-Dor river at its foot, a boat bridge beside the waste heap. Mind the fellow of low moral fibre who seems to be fencing something. And beneath the Market Square, old sewers keep their own secrets. They say a long errand pays seasoned folk in gold.",
+  "teaser": "Where journeys begin, above old sewers that still keep their own secrets."
+ },
+ "d3:youth": {
+  "edited": false,
+  "hash": "347d9f8e65374e35",
+  "intro": "Leave Cypress Forest at the foot of the great hill and you'll meet a wall of sandstone spires, striped red, gold and ochre, millennia old, and quite invisible from the hilltop above. Somewhere past that stone, vines and succulents crowd the bare rock, growing thicker and greener toward a sparkling, spring-fed pool. They call it the Eternal Spring of Youth. Finding the way in is your affair, friend.",
+  "teaser": "Beyond red-and-gold sandstone spires, green life thickens around a sparkling spring-fed pool."
+ }
+}

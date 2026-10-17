@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Valhalla World Map</title>
-<meta name="description" content="Every zone of DikuMUD II and DikuMUD III, how they connect, and where a caster can teleport in.">
+<meta name="description" content="Every zone of Valhalla's world: what waits there, how dangerous it is, and how to get there.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Alegreya+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&family=Alegreya+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* The same chart sheet as the Midgaard room map: header strip, the map, a ledger column for the selected zone. */
 :root {
@@ -16,7 +16,11 @@
   --both: #3d4a42;    /* in both */
   --tele: #6b3fa0;    /* teleport */
   --hi: #d9a21b; --line: #3d4a42; --box: #fbfcf7;
+  /* danger, by the lowest monster levels: novice, experienced, seasoned, mighty */
+  --b1: #e3f0d6; --b2: #d9eaf0; --b3: #f6e7c4; --b4: #f3d4cc; --b0: #fbfcf7;
+  --b1i: #4f7a2c; --b2i: #2f6a80; --b3i: #93690f; --b4i: #9b3a28;
   --f-display: "IM Fell English SC", "Iowan Old Style", Georgia, serif;
+  --f-story: "IM Fell English", "Iowan Old Style", Georgia, serif;
   --f-body: "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
   --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
 }
@@ -24,12 +28,16 @@
   :root:not([data-theme="light"]) {
     --paper: #121815; --sheet: #18201c; --ink: #dfe6d8; --ink-soft: #97a597; --rule: #2e3a33;
     --d3: #6fb497; --d2: #e3b84a; --both: #c9d3c6; --tele: #c4a0f0; --hi: #f2c14e; --line: #9fb0a4; --box: #1d2722;
+    --b1: #1f3020; --b2: #1b2b33; --b3: #33291a; --b4: #3a221e; --b0: #1d2722;
+    --b1i: #9ccc7a; --b2i: #7cc0d8; --b3i: #e0b45a; --b4i: #ec8c78;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --paper: #121815; --sheet: #18201c; --ink: #dfe6d8; --ink-soft: #97a597; --rule: #2e3a33;
   --d3: #6fb497; --d2: #e3b84a; --both: #c9d3c6; --tele: #c4a0f0; --hi: #f2c14e; --line: #9fb0a4; --box: #1d2722;
+  --b1: #1f3020; --b2: #1b2b33; --b3: #33291a; --b4: #3a221e; --b0: #1d2722;
+  --b1i: #9ccc7a; --b2i: #7cc0d8; --b3i: #e0b45a; --b4i: #ec8c78;
   color-scheme: dark;
 }
 html, body { height: 100%; margin: 0; }
@@ -43,10 +51,14 @@ h1 { font-family: var(--f-display); font-weight: 400; font-size: 1.9rem; margin:
 .meta { color: var(--ink-soft); font-size: .9rem; font-variant-numeric: tabular-nums; }
 .meta a { color: var(--d3); text-underline-offset: 2px; }
 .tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-left: auto; }
-input[type=search] {
+.searchbox { position: relative; }
+input[type=search], input[type=number] {
   font: inherit; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 4px;
-  background: var(--sheet); color: var(--ink); width: 14rem; max-width: 100%;
+  background: var(--sheet); color: var(--ink); box-sizing: border-box;
 }
+input[type=search] { width: 15rem; max-width: 100%; }
+input[type=number] { width: 6.5rem; }
+.lvl { display: inline-flex; align-items: center; gap: 6px; font-size: .88rem; color: var(--ink-soft); }
 button { font: 500 .88rem var(--f-body); padding: 6px 10px; border: 1px solid var(--rule); border-radius: 4px;
   background: var(--sheet); color: var(--ink); cursor: pointer; }
 button:hover { border-color: var(--ink-soft); }
@@ -55,58 +67,92 @@ button:hover { border-color: var(--ink-soft); }
 .seg button { border: 0; border-radius: 0; border-right: 1px solid var(--rule); }
 .seg button:last-child { border-right: 0; }
 .seg button[aria-pressed="true"] { background: var(--ink); color: var(--sheet); }
-main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 22rem; gap: 12px; }
+#results { position: absolute; z-index: 20; top: calc(100% + 4px); left: 0; right: 0; min-width: 15rem;
+  max-height: 60vh; overflow: auto; background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / .18); padding: 6px; display: flex; flex-direction: column; gap: 2px; }
+#results[hidden] { display: none; }
+#results button { all: unset; cursor: pointer; padding: 5px 6px; border-radius: 4px; display: flex; flex-direction: column; gap: 1px; }
+#results button:hover, #results button:focus-visible, #results button.on { background: var(--paper); }
+#results .why { font-size: .8rem; color: var(--ink-soft); }
+main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 23rem; gap: 12px; }
 #wrap { position: relative; min-height: 0; min-width: 0; background: var(--sheet); border: 1px solid var(--rule);
   border-radius: 6px; overflow: hidden; touch-action: none; cursor: grab; }
 #wrap.drag { cursor: grabbing; }
-svg { width: 100%; height: 100%; display: block; user-select: none; }
-.zoom { position: absolute; right: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 6px; }
-.zoom button { width: 34px; height: 34px; font-size: 1.1rem; padding: 0; }
+svg#svg { width: 100%; height: 100%; display: block; user-select: none; }
+.mapbtns { position: absolute; right: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 6px; }
+.mapbtns button { width: 34px; height: 34px; font-size: 1.1rem; padding: 0; }
+#key { position: absolute; right: 54px; bottom: 10px; z-index: 5; width: min(19rem, calc(100% - 70px)); max-height: calc(100% - 20px);
+  overflow: auto; background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / .18); box-sizing: border-box; }
+#key[hidden] { display: none; }
 aside { min-width: 0; overflow: auto; background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px;
   padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; }
-aside h2 { font-family: var(--f-display); font-weight: 400; font-size: 1.45rem; margin: 0; }
-aside h3 { font: 500 .72rem var(--f-body); text-transform: uppercase; letter-spacing: .09em; color: var(--ink-soft); margin: 0 0 6px; }
-.eyebrow { font: 500 .72rem var(--f-body); text-transform: uppercase; letter-spacing: .09em; color: var(--ink-soft); }
+.grab { display: none; }
+.short, .phone { display: none; }
+aside h2 { font-family: var(--f-display); font-weight: 400; font-size: 1.5rem; margin: 0; }
+h3 { font: 500 .72rem var(--f-body); text-transform: uppercase; letter-spacing: .09em; color: var(--ink-soft); margin: 0 0 6px; }
+.eyebrow { font: 500 .72rem var(--f-body); text-transform: uppercase; letter-spacing: .09em; color: var(--ink-soft);
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .id { font-family: var(--f-mono); font-size: .8rem; color: var(--ink-soft); word-break: break-all; }
+.intro { font: 1.06rem/1.5 var(--f-story); margin: 0; }
+.intro::first-letter { font-family: var(--f-display); font-size: 1.5em; }
+.ai { font-size: .78rem; color: var(--ink-soft); margin: 4px 0 0; }
 .facts { display: grid; grid-template-columns: auto minmax(0,1fr); gap: 4px 12px; margin: 0; font-size: .92rem; }
 .facts dt { color: var(--ink-soft); }
 .facts dd { margin: 0; font-variant-numeric: tabular-nums; }
-.tag { font: 500 .72rem var(--f-body); padding: 1px 6px; border-radius: 3px; border: 1px solid currentColor; white-space: nowrap; }
+.tag { font: 500 .72rem var(--f-body); padding: 1px 6px; border-radius: 3px; border: 1px solid currentColor; white-space: nowrap; text-transform: none; letter-spacing: 0; }
 .tag.d3 { color: var(--d3); } .tag.d2 { color: var(--d2); } .tag.both { color: var(--both); } .tag.soft { color: var(--ink-soft); }
-.tele { border: 1px solid var(--tele); border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
-.tele h3 { color: var(--tele); }
+.tag.draft { color: var(--hi); }
+.band { font: 700 .74rem var(--f-body); padding: 2px 7px; border-radius: 3px; white-space: nowrap; text-transform: none; letter-spacing: 0; }
+.band.b1 { background: var(--b1); color: var(--b1i); } .band.b2 { background: var(--b2); color: var(--b2i); }
+.band.b3 { background: var(--b3); color: var(--b3i); } .band.b4 { background: var(--b4); color: var(--b4i); }
+.band.b0 { background: var(--paper); color: var(--ink-soft); }
+.card { border: 1px solid var(--rule); border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.card.tele { border-color: var(--tele); } .card.tele h3 { color: var(--tele); }
 .cmd { display: flex; gap: 6px; align-items: stretch; }
 .cmd code { flex: 1; font: 500 .86rem var(--f-mono); background: var(--paper); border-radius: 4px; padding: 6px 8px; overflow-wrap: anywhere; }
 .cmd button { padding: 4px 8px; font-size: .8rem; }
-.hint { color: var(--ink-soft); font-size: .85rem; line-height: 1.45; margin: 0; }
-.hint a { color: var(--d3); text-underline-offset: 2px; }
-ul.links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: .9rem; }
+.hint { color: var(--ink-soft); font-size: .86rem; line-height: 1.45; margin: 0; }
+.hint a, .notes a { color: var(--d3); text-underline-offset: 2px; }
+ul.links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: .92rem; }
 ul.links li { line-height: 1.3; }
+ul.links details summary { color: var(--ink); font-size: .92rem; }
+ul.links details ul { list-style: none; margin: 4px 0 2px 14px; padding: 0; display: flex; flex-direction: column; gap: 3px; font-size: .85rem; color: var(--ink-soft); }
 .dir { font: 500 .75rem var(--f-mono); text-transform: uppercase; color: var(--ink-soft); }
 .go { all: unset; cursor: pointer; color: var(--d3); text-decoration: underline; text-underline-offset: 2px; }
 .go:focus-visible { outline: 2px solid var(--hi); }
 details summary { cursor: pointer; color: var(--ink-soft); font-size: .88rem; }
-.notes { white-space: pre-wrap; font-size: .86rem; line-height: 1.45; margin: 8px 0 0; }
+details[open] > summary { margin-bottom: 6px; }
+.notes { white-space: pre-wrap; font-size: .86rem; line-height: 1.45; margin: 6px 0 0; }
+.about { display: flex; flex-direction: column; gap: 10px; }
 .legend { display: grid; grid-template-columns: 1.6rem minmax(0,1fr); gap: 6px 8px; align-items: center; font-size: .88rem; }
 .legend svg { width: 1.6rem; height: 1rem; }
-#results { display: flex; flex-direction: column; gap: 2px; }
-#results button { all: unset; cursor: pointer; padding: 3px 4px; border-radius: 3px; }
-#results button:hover, #results button:focus-visible { background: var(--paper); }
+.offnote { border-left: 3px solid var(--d2); padding: 4px 10px; }
 
 /* map */
-.box { fill: var(--box); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.box { fill: var(--b0); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.zone.b1 .box { fill: var(--b1); } .zone.b2 .box { fill: var(--b2); } .zone.b3 .box { fill: var(--b3); } .zone.b4 .box { fill: var(--b4); }
 .z-d3 .box { stroke: var(--d3); } .z-d2 .box { stroke: var(--d2); } .z-both .box { stroke: var(--both); stroke-width: 2.2; }
-.zone { cursor: pointer; }
+.zone.off .box { stroke-dasharray: 5 4; }
+.zone.off { opacity: .45; }
+.zone { cursor: pointer; transition: opacity .15s; }
 .zone:focus { outline: none; }
 .zone:focus-visible .box, .zone.sel .box { stroke: var(--hi); stroke-width: 4; }
 .zone.match .box { stroke: var(--hi); stroke-width: 3; }
-.zone.dim { opacity: .35; }
+.zone.unfit, .dot.unfit { opacity: .18; }
+.edge.unfit { opacity: .12; }
 .zt { font-family: var(--f-display); fill: var(--ink); pointer-events: none; }
 .zs { font-family: var(--f-body); fill: var(--ink-soft); pointer-events: none; }
+.zi { font-family: var(--f-story); fill: var(--ink); pointer-events: none; }
 .zp { font-family: var(--f-mono); fill: var(--tele); pointer-events: none; }
 .zp.none { fill: var(--ink-soft); }
 .badge { font: 700 10px var(--f-mono); pointer-events: none; }
 .z-d3 .badge { fill: var(--d3); } .z-d2 .badge { fill: var(--d2); } .z-both .badge { fill: var(--both); }
+.lbl { font-family: var(--f-display); fill: var(--ink); paint-order: stroke; stroke: var(--sheet); stroke-width: 3.5px;
+  stroke-linejoin: round; pointer-events: none; }
+.lbl.unfit { opacity: .25; }
+.start { fill: var(--hi); stroke: var(--ink); stroke-width: 1; vector-effect: non-scaling-stroke; pointer-events: none; }
+.startLbl { font: 700 11px var(--f-body); fill: var(--ink); paint-order: stroke; stroke: var(--sheet); stroke-width: 3px; pointer-events: none; }
 .dot { fill: var(--sheet); stroke: var(--line); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 .dot.tp { fill: var(--tele); stroke: var(--tele); }
 .edge { stroke: var(--line); stroke-width: 1.4; fill: none; opacity: .75; vector-effect: non-scaling-stroke; }
@@ -114,12 +160,28 @@ details summary { cursor: pointer; color: var(--ink-soft); font-size: .88rem; }
 .edge.g-d2 { stroke: var(--d2); }
 .both .edge.g-d3 { stroke: var(--d3); }
 .edge.hl { stroke: var(--hi); stroke-width: 3; opacity: 1; }
+.edge.route { stroke: var(--hi); stroke-width: 4; opacity: 1; stroke-dasharray: none; }
 .islandLbl { font-family: var(--f-display); fill: var(--ink-soft); pointer-events: none; }
+
+/* phone: the map fills the screen; the zone slides up from the bottom */
 @media (max-width: 760px) {
-  main { grid-template-columns: minmax(0,1fr); grid-template-rows: 62vh auto; }
-  body { height: auto; }
-  input[type=search] { width: 100%; }
+  body { height: 100dvh; padding-bottom: 0; gap: 8px; }
+  h1 { font-size: 1.5rem; }
   .tools { margin-left: 0; width: 100%; }
+  .searchbox { flex: 1 1 100%; } input[type=search] { width: 100%; }
+  .long, #fit { display: none; } .short { display: inline; } .mapbtns .phone { display: block; }
+  .tools { gap: 6px; } input[type=number] { width: 6.5rem; }
+  main { display: block; position: relative; }
+  #wrap { height: 100%; }
+  aside { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; max-height: 42dvh; border-radius: 12px 12px 0 0;
+    border-bottom: 0; box-shadow: 0 -8px 24px rgb(0 0 0 / .2); padding-top: 4px;
+    padding-bottom: max(14px, env(safe-area-inset-bottom, 0px)); transition: max-height .2s; }
+  aside.full { max-height: 88dvh; }
+  .grab { display: block; all: unset; align-self: center; width: 100%; text-align: center; padding: 6px 0 2px; cursor: pointer;
+    color: var(--ink-soft); font-size: .78rem; }
+  .grab::before { content: ""; display: block; width: 40px; height: 4px; border-radius: 2px; background: var(--rule); margin: 0 auto 4px; }
+  .mapbtns { bottom: calc(42dvh + 10px); }
+  #key { bottom: calc(42dvh + 10px); }
 }
 </style>
 </head>
@@ -128,12 +190,16 @@ details summary { cursor: pointer; color: var(--ink-soft); font-size: .88rem; }
   <h1>Valhalla World Map</h1>
   <span class="meta" id="meta"></span>
   <div class="tools">
-    <div class="seg" role="group" aria-label="Which game">
-      <button type="button" data-view="d3" aria-pressed="true">DikuMUD III</button>
-      <button type="button" data-view="d2" aria-pressed="false">DikuMUD II</button>
-      <button type="button" data-view="both" aria-pressed="false">Both</button>
+    <div class="seg" role="group" aria-label="Which zones">
+      <button type="button" data-view="both" aria-pressed="true" title="Every zone of DikuMUD III and DikuMUD II together"><span class="long">Whole world</span><span class="short">World</span></button>
+      <button type="button" data-view="d3" aria-pressed="false" title="Only the zones in DikuMUD III's public source"><span class="long">DikuMUD </span>III</button>
+      <button type="button" data-view="d2" aria-pressed="false" title="Only the zones in DikuMUD II"><span class="long">DikuMUD </span>II</button>
     </div>
-    <input type="search" id="q" placeholder="Find a zone or teleport name" aria-label="Find a zone">
+    <label class="lvl"><input type="number" id="lvl" min="1" max="50" inputmode="numeric" placeholder="My level" aria-label="My level: fade zones that don't suit it"></label>
+    <div class="searchbox">
+      <input type="search" id="q" placeholder="Find a zone, creature or rumour" aria-label="Find a zone" autocomplete="off" aria-controls="results">
+      <div id="results" hidden role="listbox"></div>
+    </div>
     <button id="fit" type="button">Whole map</button>
   </div>
 </header>
@@ -145,34 +211,39 @@ details summary { cursor: pointer; color: var(--ink-soft); font-size: .88rem; }
           <path d="M0 0 L10 5 L0 10 z" fill="var(--line)"/>
         </marker>
       </defs>
-      <g id="vp"><g id="edges"></g><g id="zones"></g><g id="dots"></g></g>
+      <g id="vp"><g id="edges"></g><g id="zones"></g><g id="dots"></g><g id="labels"></g></g>
     </svg>
-    <div class="zoom">
-      <button type="button" id="zin" aria-label="Zoom in">+</button>
-      <button type="button" id="zout" aria-label="Zoom out">−</button>
-    </div>
-  </div>
-  <aside id="side">
-    <div id="detail">
-      <div class="eyebrow">Zone</div>
-      <h2>Pick a zone</h2>
-      <p class="hint">Click a zone for its teleport point, monster levels, makers and exits. Dots on a zone's edge are its rooms with an exit to another zone; lines join them. Drag to move; scroll, pinch or + and − to zoom.</p>
-    </div>
-    <div id="results" hidden></div>
-    <div>
+    <div id="key" hidden>
       <h3>Key</h3>
       <div class="legend">
-        <svg viewBox="0 0 26 16"><rect x="2" y="2" width="22" height="12" rx="2" fill="var(--box)" stroke="var(--d3)" stroke-width="1.5"/></svg><span>DikuMUD III zone (public source)</span>
-        <svg viewBox="0 0 26 16"><rect x="2" y="2" width="22" height="12" rx="2" fill="var(--box)" stroke="var(--d2)" stroke-width="1.5"/></svg><span>DikuMUD II zone</span>
+        <svg viewBox="0 0 26 16"><rect x="2" y="2" width="22" height="12" rx="2" fill="var(--b1)" stroke="var(--b1i)"/></svg><span>Novices welcome</span>
+        <svg viewBox="0 0 26 16"><rect x="2" y="2" width="22" height="12" rx="2" fill="var(--b2)" stroke="var(--b2i)"/></svg><span>For those with some experience</span>
+        <svg viewBox="0 0 26 16"><rect x="2" y="2" width="22" height="12" rx="2" fill="var(--b3)" stroke="var(--b3i)"/></svg><span>Seasoned adventurers</span>
+        <svg viewBox="0 0 26 16"><rect x="2" y="2" width="22" height="12" rx="2" fill="var(--b4)" stroke="var(--b4i)"/></svg><span>Only the mightiest</span>
+        <svg viewBox="0 0 26 16"><rect x="2" y="2" width="22" height="12" rx="2" fill="var(--box)" stroke="var(--d3)" stroke-width="1.5"/></svg><span>Zone from DikuMUD III</span>
+        <svg viewBox="0 0 26 16"><rect x="2" y="2" width="22" height="12" rx="2" fill="var(--box)" stroke="var(--d2)" stroke-width="1.5"/></svg><span>Zone from DikuMUD II</span>
         <svg viewBox="0 0 26 16"><rect x="2" y="2" width="22" height="12" rx="2" fill="var(--box)" stroke="var(--both)" stroke-width="2.4"/></svg><span>In both games</span>
+        <svg viewBox="0 0 26 16" opacity=".5"><rect x="2" y="2" width="22" height="12" rx="2" fill="var(--box)" stroke="var(--d2)" stroke-width="1.5" stroke-dasharray="4 3"/></svg><span>Not on Valhalla</span>
+        <svg viewBox="0 0 26 16"><path d="M13 2 L15.4 6.6 L20.5 7.2 L16.7 10.6 L17.8 15.5 L13 13 L8.2 15.5 L9.3 10.6 L5.5 7.2 L10.6 6.6 Z" class="start"/></svg><span>Where you start</span>
         <svg viewBox="0 0 26 16"><circle cx="13" cy="8" r="4" fill="var(--sheet)" stroke="var(--line)" stroke-width="1.5"/></svg><span>Room with an exit to another zone</span>
         <svg viewBox="0 0 26 16"><circle cx="13" cy="8" r="4" fill="var(--tele)"/></svg><span>Teleport point</span>
         <svg viewBox="0 0 26 16"><line x1="1" y1="8" x2="25" y2="8" stroke="var(--line)" stroke-width="2"/></svg><span>Exit</span>
         <svg viewBox="0 0 26 16"><line x1="1" y1="8" x2="25" y2="8" stroke="var(--line)" stroke-width="2" stroke-dasharray="5 4"/></svg><span>Up or down</span>
         <svg viewBox="0 0 26 16"><line x1="1" y1="8" x2="21" y2="8" stroke="var(--line)" stroke-width="2"/><path d="M17 4 L25 8 L17 12 z" fill="var(--line)"/></svg><span>One way</span>
+        <svg viewBox="0 0 26 16"><line x1="1" y1="8" x2="25" y2="8" stroke="var(--hi)" stroke-width="4"/></svg><span>The way from where you start</span>
       </div>
-      <p class="hint" style="margin-top:8px">A box's area grows with its number of rooms. In <b>Both</b>, lines are coloured by the game that has the exit.</p>
+      <p class="hint" style="margin-top:8px">Colour shows how dangerous a zone's weakest monsters are. A box's area grows with its number of rooms.</p>
     </div>
+    <div class="mapbtns">
+      <button type="button" id="fit2" class="phone" aria-label="Whole map">⤢</button>
+      <button type="button" id="keybtn" aria-label="Show the key" aria-expanded="false" aria-controls="key">?</button>
+      <button type="button" id="zin" aria-label="Zoom in">+</button>
+      <button type="button" id="zout" aria-label="Zoom out">−</button>
+    </div>
+  </div>
+  <aside id="side">
+    <button type="button" class="grab" id="grab" aria-label="Show more">more</button>
+    <div id="detail"></div>
     <p class="hint" id="about"></p>
   </aside>
 </main>
@@ -181,31 +252,40 @@ const DATA = __DATA__;
 const NS = "http://www.w3.org/2000/svg";
 const DNAME = { n: "north", e: "east", s: "south", w: "west", u: "up", d: "down", ne: "northeast", nw: "northwest", se: "southeast", sw: "southwest" };
 const GNAME = { d3: "DikuMUD III", d2: "DikuMUD II" };
+const BANDS = [null, ["Novices welcome", 10], ["Some experience", 25], ["Seasoned adventurers", 40], ["Only the mightiest", 99]];
+const START = "udgaard";
 const Z = DATA.zones;
 const el = (n, a, p) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); p && p.appendChild(e); return e; };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const svg = document.getElementById("svg"), vp = document.getElementById("vp"), wrap = document.getElementById("wrap");
-const edgesG = document.getElementById("edges"), zonesG = document.getElementById("zones"), dotsG = document.getElementById("dots");
+const edgesG = document.getElementById("edges"), zonesG = document.getElementById("zones"), dotsG = document.getElementById("dots"), labelsG = document.getElementById("labels");
+const side = document.getElementById("side");
 const canvas = document.createElement("canvas").getContext("2d");
-let VIEW = "d3", V = null, view = { s: 1, x: 0, y: 0 }, selected = null, matches = new Set();
+let VIEW = "both", V = null, view = { s: 1, x: 0, y: 0 }, selected = null, LEVEL = null;
 let nodeByKey = new Map(), nodeOfZone = new Map(), drawn = [];
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
 
 document.getElementById("about").innerHTML =
-  `Built on ${esc(DATA.built)} from the public sources: <a href="https://github.com/Seifert69/DikuMUD3">DikuMUD III</a> ` +
-  `(${DATA.counts.d3.zones} of the ${DATA.counts.d3.listed} zones in its zone list are public) and ` +
-  `<a href="https://github.com/Seifert69/DikuMUD2">DikuMUD II</a> (${DATA.counts.d2.zones} zones), both LGPL-2.1. ` +
-  `Valhalla runs zones whose source isn't public, so it has more than this map. Only exits are drawn: ships, portals and ` +
-  `other moves made by scripts are not. An unofficial fan map: the game is the final word. ` +
-  `<a href="./">Midgaard room by room →</a>`;
+  `Built on ${esc(DATA.built)} from the public sources of <a href="https://github.com/Seifert69/DikuMUD3">DikuMUD III</a> ` +
+  `and <a href="https://github.com/Seifert69/DikuMUD2">DikuMUD II</a> (LGPL-2.1), which Valhalla grew from. Valhalla also runs ` +
+  `zones whose source isn't public, so the game has more than this map. Only exits are drawn: ships, portals and other ` +
+  `moves made by scripts are not. An unofficial fan map: the game is the final word. <a href="./">Midgaard room by room →</a>`;
 
 // The zone shown for a node: DikuMUD III's version when it has one
 const main = n => Z[n.m.find(k => k.startsWith("d3:")) || n.m[0]];
 const tagOf = n => n.m.length > 1 ? "both" : n.m[0].slice(0, 2);
 const teleOf = n => { for (const k of n.m) if (Z[k].teleport.length) return { z: Z[k], t: Z[k].teleport[0] }; return null; };
+const levelsOf = n => n.m.map(k => Z[k].levels).find(Boolean);
+const introOf = n => n.m.map(k => Z[k]).find(z => z.intro);
+const onValhalla = n => n.m.some(k => Z[k].valhalla);
+function bandOf(lv) { if (!lv) return 0; const lo = lv[0]; return lo <= 10 ? 1 : lo <= 25 ? 2 : lo <= 40 ? 3 : 4; }
+const lvText = lv => lv ? `${lv[0]}${lv[1] !== lv[0] ? "–" + lv[1] : ""}` : "";
+// Suits a player of level L: its weakest monsters aren't far above L, and it isn't all far below
+const fits = (n, L) => { const lv = levelsOf(n); return !lv || (lv[0] <= L + 3 && lv[1] >= L - 8); };
 
 function build() {
   V = DATA.views[VIEW];
-  edgesG.replaceChildren(); zonesG.replaceChildren(); dotsG.replaceChildren();
+  edgesG.replaceChildren(); zonesG.replaceChildren(); dotsG.replaceChildren(); labelsG.replaceChildren();
   svg.classList.toggle("both", VIEW === "both");
   nodeByKey = new Map(V.nodes.map(n => [n.k, n]));
   nodeOfZone = new Map(); V.nodes.forEach(n => n.m.forEach(k => nodeOfZone.set(k, n)));
@@ -251,24 +331,33 @@ function build() {
     const [s, t] = oneway && !p.dirs.has(p.a) ? [B, A] : [A, B];
     const ln = el("line", { x1: s.x, y1: s.y, x2: t.x, y2: t.y, class: `edge g-${p.g}${p.vert ? " vert" : ""}` }, edgesG);
     if (oneway) ln.setAttribute("marker-end", "url(#arr)");
-    drawn.push({ el: ln, a: A.node.k, b: B.node.k });
+    drawn.push({ el: ln, a: A.node.k, b: B.node.k, za: A.g + ":" + A.z, zb: B.g + ":" + B.z });
   }
   for (const n of V.nodes) {
-    const z = main(n), tag = tagOf(n), h = n.s / 2;
-    const g = el("g", { class: `zone z-${tag}`, tabindex: "0", role: "button", "aria-label": z.title }, zonesG);
-    el("title", {}, g).textContent = z.title;
+    const z = main(n), tag = tagOf(n), h = n.s / 2, intro = introOf(n);
+    n.band = bandOf(levelsOf(n));
+    const off = !onValhalla(n);
+    const g = el("g", { class: `zone z-${tag} b${n.band}${off ? " off" : ""}`, tabindex: "0", role: "button", "aria-label": z.title }, zonesG);
+    el("title", {}, g).textContent = z.title + (intro ? " — " + intro.teaser : "") + (off ? " (not on Valhalla)" : "");
     el("rect", { x: n.x - h, y: n.y - h, width: n.s, height: n.s, rx: 6, class: "box" }, g);
     n.tEl = el("text", { class: "zt" }, g);
     n.sEl = el("text", { class: "zs" }, g);
     n.pEl = el("text", { class: "zp" }, g);
+    n.iEl = el("text", { class: "zi" }, g);
     const b = el("text", { class: "badge", x: n.x + h - 6, y: n.y - h + 13, "text-anchor": "end" }, g);
     b.textContent = tag === "both" ? "II+III" : tag === "d2" ? "II" : "III";
-    const lv = n.m.map(k => Z[k].levels).find(Boolean);
-    n.sub = `${n.m.map(k => Z[k].rooms).reduce((a, b) => Math.max(a, b))} rooms` + (lv ? ` · monsters lvl ${lv[0]}${lv[1] !== lv[0] ? "–" + lv[1] : ""}` : "");
+    const lv = levelsOf(n);
+    n.sub = `${n.m.map(k => Z[k].rooms).reduce((a, b) => Math.max(a, b))} rooms` + (lv ? ` · ${BANDS[n.band][0].toLowerCase()} (${lvText(lv)})` : "");
     const tp = teleOf(n);
-    n.tele = tp ? "✦ " + tp.t.name : (n.m.some(k => Z[k].walk) ? "no teleport · walk in" : "no teleport point");
-    if (!tp) n.pEl.classList.add("none");
+    n.tele = tp ? "✦ " + tp.t.name : "";
+    n.intro = intro ? intro.teaser : "";
     n.g = g;
+    n.lbl = el("text", { class: "lbl", "text-anchor": "middle" }, labelsG);
+    n.lbl.textContent = z.title;
+    if (n.m.some(k => Z[k].id === START)) {
+      n.star = el("path", { class: "start", d: "M0 -10 L2.9 -4 L9.5 -3.1 L4.7 1.5 L5.9 8 L0 4.9 L-5.9 8 L-4.7 1.5 L-9.5 -3.1 L-2.9 -4 Z" }, labelsG);
+      n.starLbl = el("text", { class: "startLbl" }, labelsG); n.starLbl.textContent = "You start here";
+    }
     g.addEventListener("click", ev => { ev.stopPropagation(); select(n.k, false); });
     g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select(n.k, false); } });
   }
@@ -297,6 +386,7 @@ function build() {
   }
   const nz = V.nodes.length, ne = V.edges.length;
   document.getElementById("meta").innerHTML = `${nz} zones · ${ne} exits between zones · <a href="./">Midgaard rooms</a>`;
+  applyLevel();
 }
 
 // Text that fits the box at the current zoom: a readable size on screen, cut to the box's width
@@ -307,27 +397,71 @@ function fitText(t, maxW, px, font) {
   while (lo < hi) { const m = (lo + hi + 1) >> 1; canvas.measureText(t.slice(0, m) + "…").width <= maxW ? lo = m : hi = m - 1; }
   return lo ? t.slice(0, lo) + "…" : "";
 }
+function wrapText(t, maxW, px, font, maxLines) {
+  canvas.font = `${px}px ${font}`;
+  const words = t.split(/\s+/), lines = [];
+  let cur = "";
+  for (const w of words) {
+    const nxt = cur ? cur + " " + w : w;
+    if (canvas.measureText(nxt).width <= maxW || !cur) cur = nxt; else { lines.push(cur); cur = w; }
+    if (lines.length === maxLines) break;
+  }
+  if (lines.length < maxLines && cur) lines.push(cur);
+  if (lines.length === maxLines && lines.join(" ").length < t.length) lines[maxLines - 1] = fitText(lines[maxLines - 1] + " …", maxW, px, font);
+  return lines.map(l => fitText(l, maxW, px, font));
+}
 const css = getComputedStyle(document.documentElement);
-const FD = css.getPropertyValue("--f-display"), FB = css.getPropertyValue("--f-body"), FM = css.getPropertyValue("--f-mono");
+const FD = css.getPropertyValue("--f-display"), FB = css.getPropertyValue("--f-body"), FM = css.getPropertyValue("--f-mono"), FS = css.getPropertyValue("--f-story");
 function place() {
   const s = view.s, k = 1 / s;
-  for (const n of V.nodes) {
+  const placed = [];       // screen rectangles of labels drawn so far
+  const order = [...V.nodes].sort((a, b) => (b === nodeByKey.get(selected)) - (a === nodeByKey.get(selected)) || b.s - a.s);
+  for (const n of order) {
     const h = n.s / 2, wpx = (n.s - 16) * s;       // usable width in screen px
     const tpx = Math.min(17, Math.max(11, 15 * s)), spx = Math.min(13, Math.max(10, 12 * s));
     const showSub = n.s * s >= 120, top = n.y - h;
-    const lines = [[n.tEl, n.m.length ? main(n).title : "", tpx, FD, true]];
-    if (showSub) lines.push([n.sEl, n.sub, spx, FB, true], [n.pEl, n.tele, spx, FM, true]);
+    canvas.font = `${tpx}px ${FD}`;
+    const fitsInside = wpx >= 30 && canvas.measureText(main(n).title).width <= wpx;
+    const lines = [[n.tEl, main(n).title, tpx, FD]];
+    if (showSub) { lines.push([n.sEl, n.sub, spx, FB]); if (n.tele) lines.push([n.pEl, n.tele, spx, FM]); else n.pEl.textContent = ""; }
     else { n.sEl.textContent = ""; n.pEl.textContent = ""; }
     let y = top + (showSub ? 22 * k + 6 : n.s / 2 + tpx * k / 3);
     for (const [e, t, px, font] of lines) {
-      if (wpx < 30) { e.textContent = ""; continue; }
+      if (wpx < 30 || (!showSub && !fitsInside)) { e.textContent = ""; continue; }
       e.textContent = fitText(t, wpx, px, font);
       e.setAttribute("x", n.x - h + 8); e.setAttribute("y", y); e.setAttribute("font-size", px * k);
       y += (px + 5) * k;
     }
+    // the teaser, inside a box with room for it
+    n.iEl.replaceChildren();
+    const ipx = Math.min(15, Math.max(11, 13 * s)), room = (n.y + h - 10 * k - y) * s;
+    if (showSub && n.intro && room > ipx * 2.6 && wpx > 120) {
+      const ls = wrapText(n.intro, wpx, ipx, FS, Math.max(1, Math.floor(room / (ipx * 1.35))));
+      y += 6 * k;
+      ls.forEach((l, i) => { const t = el("tspan", { x: n.x - h + 8, y: y + (i + 1) * ipx * 1.35 * k }, n.iEl); t.textContent = l; });
+      n.iEl.setAttribute("font-size", ipx * k);
+    }
+    // a name tag under a box too small for its name, where it doesn't cover another
+    n.lbl.textContent = "";
+    if (!fitsInside || (!showSub && wpx < 30)) {
+      const lpx = 12, sx = n.x * s + view.x, sy = (n.y + h) * s + view.y + 4;
+      canvas.font = `${lpx}px ${FD}`;
+      const w = canvas.measureText(main(n).title).width, r = [sx - w / 2 - 2, sy, sx + w / 2 + 2, sy + lpx + 3];
+      if (!placed.some(p => r[0] < p[2] && r[2] > p[0] && r[1] < p[3] && r[3] > p[1])) {
+        placed.push(r);
+        n.lbl.textContent = main(n).title;
+        n.lbl.setAttribute("x", n.x); n.lbl.setAttribute("y", n.y + h + (4 + lpx) * k);
+        n.lbl.setAttribute("font-size", lpx * k); n.lbl.style.strokeWidth = 3.5 * k;
+      }
+    }
+    if (n.star) {
+      const sc = 1.3 * k;
+      n.star.setAttribute("transform", `translate(${n.x - h} ${n.y - h}) scale(${sc})`);
+      n.starLbl.setAttribute("x", n.x - h + 15 * k); n.starLbl.setAttribute("y", n.y - h - 8 * k);
+      n.starLbl.setAttribute("font-size", 12 * k); n.starLbl.style.strokeWidth = 3 * k;
+    }
   }
   for (const d of V.dots) d.el.setAttribute("r", (d.el.classList.contains("tp") ? 5.5 : 4) * k);
-  edgesG.querySelectorAll("marker path");
   document.querySelector("#arr").setAttribute("markerWidth", 9 * k);
   document.querySelector("#arr").setAttribute("markerHeight", 9 * k);
 }
@@ -336,10 +470,11 @@ const apply = () => { vp.setAttribute("transform", `translate(${view.x} ${view.y
 function bounds() {
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
   for (const n of V.nodes) { x0 = Math.min(x0, n.x - n.s / 2); y0 = Math.min(y0, n.y - n.s / 2); x1 = Math.max(x1, n.x + n.s / 2); y1 = Math.max(y1, n.y + n.s / 2); }
-  return { x0: x0 - 40, y0: y0 - 80, x1: x1 + 40, y1: y1 + 40 };
+  return { x0: x0 - 40, y0: y0 - 80, x1: x1 + 40, y1: y1 + 60 };
 }
+const mapH = () => wrap.clientHeight - (matchMedia("(max-width: 760px)").matches ? side.offsetHeight : 0);
 function fit() {
-  const b = bounds(), w = wrap.clientWidth, h = wrap.clientHeight;
+  const b = bounds(), w = wrap.clientWidth, h = mapH();
   view.s = Math.min(w / (b.x1 - b.x0), h / (b.y1 - b.y0));
   view.x = (w - (b.x1 - b.x0) * view.s) / 2 - b.x0 * view.s;
   view.y = (h - (b.y1 - b.y0) * view.s) / 2 - b.y0 * view.s;
@@ -351,12 +486,12 @@ function zoomAt(f, cx, cy) {
 }
 function centreOn(n) {
   view.s = Math.max(view.s, Math.min(1.4, (wrap.clientWidth * 0.5) / n.s));
-  view.x = wrap.clientWidth / 2 - n.x * view.s; view.y = wrap.clientHeight / 2 - n.y * view.s; apply();
+  view.x = wrap.clientWidth / 2 - n.x * view.s; view.y = mapH() / 2 - n.y * view.s; apply();
 }
 wrap.addEventListener("wheel", ev => { ev.preventDefault(); const b = wrap.getBoundingClientRect(); zoomAt(Math.exp(-ev.deltaY * 0.0015), ev.clientX - b.left, ev.clientY - b.top); }, { passive: false });
 const pts = new Map(); let last = null, pinch = null, moved = 0;
 wrap.addEventListener("pointerdown", ev => {
-  if (ev.target.closest("button")) return;
+  if (ev.target.closest("button, #key")) return;
   pts.set(ev.pointerId, [ev.clientX, ev.clientY]); moved = 0;
   if (pts.size === 1) { last = [ev.clientX, ev.clientY]; wrap.classList.add("drag"); }
   if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = Math.hypot(a[0] - b[0], a[1] - b[1]); }
@@ -376,9 +511,29 @@ wrap.addEventListener("pointermove", ev => {
 const up = ev => { pts.delete(ev.pointerId); if (pts.size < 2) pinch = null; if (!pts.size) { last = null; wrap.classList.remove("drag"); } };
 wrap.addEventListener("pointerup", up); wrap.addEventListener("pointercancel", up);
 wrap.addEventListener("click", ev => { if (moved > 4) ev.stopPropagation(); }, true);
-document.getElementById("zin").onclick = () => zoomAt(1.5, wrap.clientWidth / 2, wrap.clientHeight / 2);
-document.getElementById("zout").onclick = () => zoomAt(1 / 1.5, wrap.clientWidth / 2, wrap.clientHeight / 2);
+document.getElementById("zin").onclick = () => zoomAt(1.5, wrap.clientWidth / 2, mapH() / 2);
+document.getElementById("zout").onclick = () => zoomAt(1 / 1.5, wrap.clientWidth / 2, mapH() / 2);
 document.getElementById("fit").onclick = fit;
+document.getElementById("fit2").onclick = fit;
+const keyEl = document.getElementById("key"), keyBtn = document.getElementById("keybtn");
+keyBtn.onclick = () => { keyEl.hidden = !keyEl.hidden; keyBtn.setAttribute("aria-expanded", !keyEl.hidden); };
+const grab = document.getElementById("grab");
+grab.onclick = () => { const f = side.classList.toggle("full"); grab.textContent = f ? "less" : "more"; grab.setAttribute("aria-label", f ? "Show less" : "Show more"); };
+
+// My level: fade what doesn't suit it
+const lvlIn = document.getElementById("lvl");
+function applyLevel() {
+  const L = parseInt(lvlIn.value, 10);
+  LEVEL = L >= 1 && L <= 50 ? L : null;
+  for (const n of V.nodes) {
+    const no = LEVEL != null && !fits(n, LEVEL);
+    n.g.classList.toggle("unfit", no); n.lbl.classList.toggle("unfit", no); n.unfit = no;
+  }
+  for (const d of V.dots || []) d.el.classList.toggle("unfit", d.node.unfit);
+  for (const d of drawn) d.el.classList.toggle("unfit", nodeByKey.get(d.a).unfit && nodeByKey.get(d.b).unfit);
+}
+lvlIn.value = store.get("worldmap.level") || "";
+lvlIn.addEventListener("input", () => { store.set("worldmap.level", lvlIn.value); applyLevel(); });
 
 // What was checked in a running game (DikuMUD III only: there is no DikuMUD II server to try)
 function checked(z) {
@@ -392,91 +547,144 @@ function walkChecked(z) {
   return v.walk_ok ? `Tried in a test server on ${esc(v.on)}: it gets there.` :
     `<b>Not confirmed:</b> in a test server on ${esc(v.on)} this walk ended in ${esc((v.walk_end || "").replace(/\s*\[.*\]$/, ""))} instead, so something in the game (a guard, a script) works differently from the zone file.`;
 }
+const cmdBox = c => `<div class="cmd"><code>${esc(c)}</code><button type="button" data-copy="${esc(c)}">Copy</button></div>`;
+const zname = (g, id) => { const z = Z[g + ":" + id]; return z ? z.title : id; };
 
-// The zone panel
-function zoneSection(z, n) {
-  const lv = z.levels ? `${z.levels[0]}${z.levels[1] !== z.levels[0] ? "–" + z.levels[1] : ""}` : "none loaded";
-  const yrs = z.years.length ? (z.years.length > 1 ? `${z.years[0]}–${z.years[z.years.length - 1]}` : z.years[0]) : "not given";
-  let tele;
+// How to get there: on foot from where players start, then by spell
+function gettingThere(z) {
+  let out = "";
+  if (z.id === START) out += `<p class="hint">You start here, and come back here when you die: in the Temple of Udgaard.</p>`;
+  else if (z.route) {
+    const via = z.route.via.length ? ` through ${z.route.via.map(v => esc(zname(z.g, v))).join(", ")}` : "";
+    out += `<div class="card"><h3>On foot</h3><p class="hint">About <b>${z.route.n} moves</b> from the Temple of Udgaard, where you start${via}, ` +
+      `to ${esc(z.route.to)}.</p><details><summary>The moves</summary>${cmdBox(z.route.steps)}</details></div>`;
+  } else out += `<div class="card"><h3>On foot</h3><p class="hint">No way in on foot from the Temple of Udgaard in the public source: a ship, a portal or a spell takes you there.</p></div>`;
   if (z.teleport.length) {
-    const t = z.teleport[0], cmd = `cast controlled teleport ${t.name}`;
-    tele = `<div class="tele"><h3>Teleport point</h3><div class="cmd"><code>${esc(cmd)}</code><button type="button" data-copy="${esc(cmd)}">Copy</button></div>` +
+    const t = z.teleport[0];
+    out += `<div class="card tele"><h3>By teleport</h3>${cmdBox("cast controlled teleport " + t.name)}` +
       `<p class="hint">Lands in <b>${esc(t.title)}</b>. ${checked(z)}</p>` +
       (z.teleport.length > 1 ? `<p class="hint">Also: ${z.teleport.slice(1).map(o => `<code>${esc(o.name)}</code> (${esc(o.title)})`).join(", ")}</p>` : "") + `</div>`;
-  } else {
-    const why = z.named === 0 ? "none of its rooms has a name the spell can find" : z.blocked >= z.rooms ? "every room blocks teleport" : "no room passes the checks (name used elsewhere, teleport blocked, or an aggressive monster)";
-    tele = `<div class="tele"><h3>No teleport point</h3><p class="hint">${esc(why[0].toUpperCase() + why.slice(1))}.</p>` +
-      (z.walk ? `<div class="cmd"><code>${esc("cast controlled teleport " + z.walk.name)}</code><button type="button" data-copy="${esc("cast controlled teleport " + z.walk.name)}">Copy</button></div>` +
-        `<p class="hint">Lands in ${esc(Z[z.g + ":" + z.walk.zone].title)}. Then walk <b>${esc(z.walk.steps)}</b> to ${esc(z.walk.to)}. ${walkChecked(z)}</p>`
-        : `<p class="hint">No walk from any teleport point either, in the public source.</p>`) + `</div>`;
+  } else if (z.walk) {
+    out += `<div class="card tele"><h3>By teleport</h3><p class="hint">No room here takes a teleport. The nearest that does:</p>${cmdBox("cast controlled teleport " + z.walk.name)}` +
+      `<p class="hint">Lands in ${esc(zname(z.g, z.walk.zone))}. Then walk <b>${esc(z.walk.steps)}</b> to ${esc(z.walk.to)}. ${walkChecked(z)}</p></div>`;
   }
-  const links = z.border.map(b => {
-    const to = Z[z.g + ":" + b.z], tn = nodeOfZone.get(z.g + ":" + b.z);
-    const name = tn ? `<button type="button" class="go" data-go="${esc(tn.k)}">${esc(to.title)}</button>` : esc(to ? to.title : b.z);
-    return `<li>${esc(b.t)} <span class="dir">${DNAME[b.d]}</span> → ${name}<span class="hint"> · ${esc(b.tt)}</span></li>`;
-  }).join("");
-  const src = z.g === "d2" && z.in_d3_list ? `<p class="hint">Listed in DikuMUD III's zone list too, but its DikuMUD III source isn't public: this is the DikuMUD II version.</p>` : "";
-  return `${tele}<dl class="facts"><dt>Rooms</dt><dd>${z.rooms}</dd><dt>Monster levels</dt><dd>${lv}</dd>` +
-    `<dt>Made by</dt><dd>${z.creators.length ? esc(z.creators.join(", ")) : "not given"}</dd><dt>Years</dt><dd>${yrs}</dd></dl>${src}` +
-    `<div><h3>Exits to other zones</h3>${links ? `<ul class="links">${links}</ul>` : '<p class="hint">None in the source.</p>'}</div>` +
+  return out;
+}
+// Exits, one line per zone they lead to
+function exitsOf(z) {
+  const by = new Map();
+  for (const b of z.border) { if (!by.has(b.z)) by.set(b.z, []); by.get(b.z).push(b); }
+  if (!by.size) return '<p class="hint">None in the source.</p>';
+  return `<ul class="links">${[...by].sort((a, b) => b[1].length - a[1].length).map(([zid, list]) => {
+    const to = Z[z.g + ":" + zid], tn = nodeOfZone.get(z.g + ":" + zid);
+    const name = tn ? `<button type="button" class="go" data-go="${esc(tn.k)}">${esc(to.title)}</button>` : esc(to ? to.title : zid);
+    const rows = list.map(b => `<li>${esc(b.t)} <span class="dir">${DNAME[b.d]}</span> → ${esc(b.tt)}</li>`).join("");
+    return list.length === 1 ? `<li>${name} <span class="hint">· ${esc(list[0].t)}, ${DNAME[list[0].d]}</span></li>` :
+      `<li><details><summary>${name} <span class="hint">· ${list.length} ways</span></summary><ul>${rows}</ul></details></li>`;
+  }).join("")}</ul>`;
+}
+// The facts for people who want them
+function aboutOf(z) {
+  const yrs = z.years.length ? (z.years.length > 1 ? `${z.years[0]}–${z.years[z.years.length - 1]}` : z.years[0]) : "";
+  const src = z.g === "d2" && z.in_d3_list ? `<p class="hint">Listed in Valhalla's zone list too, but its newer source isn't public: this is the DikuMUD II version.</p>` : "";
+  return `<dl class="facts"><dt>Zone</dt><dd class="id">${esc(z.id)}@${z.g === "d3" ? "III" : "II"}</dd><dt>Rooms</dt><dd>${z.rooms}</dd>` +
+    `<dt>Monster levels</dt><dd>${z.levels ? lvText(z.levels) : "none loaded"}</dd>` +
+    (z.creators.length ? `<dt>Made by</dt><dd>${esc(z.creators.map(c => c[0].toUpperCase() + c.slice(1)).join(", "))}</dd>` : "") +
+    (yrs ? `<dt>Years</dt><dd>${yrs}</dd>` : "") + `</dl>${src}` +
     (z.notes ? `<details><summary>Builder's notes</summary><p class="notes">${esc(z.notes)}</p></details>` : "");
 }
 function select(key, centre) {
   const n = nodeByKey.get(key); if (!n) return;
   if (selected && nodeByKey.get(selected)) nodeByKey.get(selected).g.classList.remove("sel");
   selected = key; n.g.classList.add("sel"); zonesG.appendChild(n.g);
-  for (const d of drawn) d.el.classList.toggle("hl", d.a === key || d.b === key);
-  if (centre) centreOn(n);
   const zs = n.m.map(k => Z[k]).sort((a, b) => a.g < b.g ? 1 : -1);
-  const z = zs[0], tag = tagOf(n);
-  let html = `<div class="eyebrow"><span class="tag ${tag}">${tag === "both" ? "DikuMUD II + III" : GNAME[tag]}</span></div>` +
-    `<h2>${esc(z.title)}</h2><div class="id">${n.m.map(k => esc(k.slice(3)) + "@" + (k.startsWith("d3") ? "III" : "II")).join(" · ")}</div>`;
-  if (zs.length > 1) {
-    html += `<div><h3>DikuMUD III</h3></div>${zoneSection(zs[0], n)}<details><summary>The DikuMUD II version</summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">${zoneSection(zs[1], n)}</div></details>`;
-  } else html += zoneSection(z, n);
+  const z = zs[0], tag = tagOf(n), lv = levelsOf(n), iz = introOf(n);
+  // the way from where you start, along the map's lines
+  const path = new Set(z.route ? [z.g + ":" + START, ...z.route.via.map(v => z.g + ":" + v), z.g + ":" + z.id] : []);
+  const seq = z.route ? [z.g + ":" + START, ...z.route.via.map(v => z.g + ":" + v), z.g + ":" + z.id] : [];
+  const steps = new Set(seq.slice(1).map((k, i) => [seq[i], k].sort().join("|")));
+  for (const d of drawn) {
+    d.el.classList.toggle("hl", d.a === key || d.b === key);
+    d.el.classList.toggle("route", path.size > 1 && steps.has([d.za, d.zb].sort().join("|")));
+  }
+  if (centre) centreOn(n);
+  const off = !onValhalla(n);
+  let html = `<div class="eyebrow"><span class="band b${n.band}">${n.band ? BANDS[n.band][0] + " · " + lvText(lv) : "No monsters"}</span>` +
+    `<span class="tag ${tag}">${tag === "both" ? "DikuMUD II + III" : GNAME[tag]}</span></div><h2>${esc(z.title)}</h2>`;
+  if (off) html += `<p class="hint offnote">Not on Valhalla: this zone is in DikuMUD II's source but not in Valhalla's zone list.</p>`;
+  if (iz) html += `<div><p class="intro">${esc(iz.intro)}</p><p class="ai">Written with AI from the zone's own descriptions${iz.draft ? ' <span class="tag draft">draft, not yet reviewed</span>' : ""}.</p></div>`;
+  html += gettingThere(z);
+  html += `<div><h3>Exits to other zones</h3>${exitsOf(z)}</div>`;
+  html += `<details class="about-d"><summary>About this zone's data</summary><div class="about">${aboutOf(z)}` +
+    (zs.length > 1 ? `<details><summary>The DikuMUD II version</summary><div class="about">${gettingThere(zs[1])}${aboutOf(zs[1])}</div></details>` : "") + `</div></details>`;
   const det = document.getElementById("detail");
   det.innerHTML = html;
   det.style.display = "flex"; det.style.flexDirection = "column"; det.style.gap = "12px";
+  side.scrollTop = 0;
   det.querySelectorAll("[data-go]").forEach(b => b.onclick = () => select(b.dataset.go, true));
   det.querySelectorAll("[data-copy]").forEach(b => b.onclick = () => {
     const ok = () => { b.textContent = "Copied"; setTimeout(() => b.textContent = "Copy", 1500); };
     try { navigator.clipboard.writeText(b.dataset.copy).then(ok, () => {}); } catch (e) {}
   });
   try { history.replaceState(null, "", `#${VIEW}/${encodeURIComponent(key)}`); } catch (e) {}
+  place();
 }
-// Search over this view's zones
+// Search this view's zones: names, teleport names, introductions
 const q = document.getElementById("q"), results = document.getElementById("results");
 function search() {
   const s = q.value.trim().toLowerCase();
   V.nodes.forEach(n => n.g.classList.remove("match"));
-  matches = new Set();
   if (!s) { results.hidden = true; return; }
-  const hits = V.nodes.filter(n => n.m.some(k => { const z = Z[k]; return z.title.toLowerCase().includes(s) || z.id.includes(s) || z.teleport.some(t => t.name.toLowerCase().includes(s)); }));
-  hits.forEach(n => { n.g.classList.add("match"); matches.add(n.k); });
+  const hits = [];
+  for (const n of V.nodes) {
+    let why = null, rank = 9;
+    for (const k of n.m) {
+      const z = Z[k];
+      if (z.title.toLowerCase().includes(s) || z.id.includes(s)) { rank = Math.min(rank, 0); why = why || ""; }
+      const t = z.teleport.find(t => t.name.toLowerCase().includes(s));
+      if (t && rank > 1) { rank = 1; why = "teleport: " + t.name; }
+      if (z.intro && rank > 2) {
+        const i = z.intro.toLowerCase().indexOf(s);
+        if (i >= 0) { rank = 2; const a = Math.max(0, z.intro.lastIndexOf(" ", Math.max(0, i - 30)) + 1); why = "…" + z.intro.slice(a, a + 70) + "…"; }
+      }
+    }
+    if (why != null) hits.push({ n, why, rank });
+  }
+  hits.sort((a, b) => a.rank - b.rank || main(a.n).title.localeCompare(main(b.n).title));
+  hits.forEach(h => h.n.g.classList.add("match"));
   results.hidden = false;
-  results.innerHTML = `<div class="eyebrow">${hits.length} zone${hits.length === 1 ? "" : "s"}</div>` +
-    hits.slice(0, 40).map(n => `<button type="button" data-go="${esc(n.k)}">${esc(main(n).title)} <span class="id">${esc(main(n).id)}</span></button>`).join("");
-  results.querySelectorAll("[data-go]").forEach(b => b.onclick = () => select(b.dataset.go, true));
+  results.innerHTML = hits.length ? hits.slice(0, 30).map((h, i) => `<button type="button" role="option" data-go="${esc(h.n.k)}"${i === 0 ? ' class="on"' : ""}>` +
+    `<span>${esc(main(h.n).title)}</span>${h.why ? `<span class="why">${esc(h.why)}</span>` : ""}</button>`).join("") :
+    `<p class="hint" style="padding:4px 6px">Nothing called that in this view.</p>`;
+  results.querySelectorAll("[data-go]").forEach(b => b.onclick = () => { select(b.dataset.go, true); results.hidden = true; });
 }
 q.addEventListener("input", search);
-q.addEventListener("keydown", ev => { if (ev.key === "Enter") { const b = results.querySelector("[data-go]"); b && b.click(); } });
+q.addEventListener("focus", () => { if (q.value.trim()) search(); });
+q.addEventListener("keydown", ev => {
+  const bs = [...results.querySelectorAll("[data-go]")], i = bs.findIndex(b => b.classList.contains("on"));
+  if (ev.key === "Enter" && bs.length) { (bs[i] || bs[0]).click(); q.blur(); }
+  else if ((ev.key === "ArrowDown" || ev.key === "ArrowUp") && bs.length) {
+    ev.preventDefault(); bs.forEach(b => b.classList.remove("on"));
+    const j = (i + (ev.key === "ArrowDown" ? 1 : bs.length - 1)) % bs.length; bs[j].classList.add("on"); bs[j].scrollIntoView({ block: "nearest" });
+  } else if (ev.key === "Escape") results.hidden = true;
+});
+document.addEventListener("pointerdown", ev => { if (!ev.target.closest(".searchbox")) results.hidden = true; });
 function setView(v, keep) {
   VIEW = v;
   document.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === v));
   const prev = selected; selected = null;
-  build(); fit(); search();
+  build(); fit(); if (q.value.trim()) search();
   // keep the same zone selected when it's in this view too
   const want = keep || prev;
-  if (want) {
-    const zk = (nodeByKey.get(want) ? want : null) || (() => { for (const n of V.nodes) if (n.k === want || n.m.some(k => want.endsWith(k.slice(3)))) return n.k; })();
-    if (zk) select(zk, true);
-  }
+  const zk = want && ((nodeByKey.get(want) ? want : null) || (() => { for (const n of V.nodes) if (n.m.some(k => want.endsWith(":" + k.slice(3)) || want === k)) return n.k; })());
+  select(zk || startKey(), !!keep);
 }
+const startKey = () => { const n = V.nodes.find(n => n.m.some(k => Z[k].id === START)); return n ? n.k : V.nodes[0].k; };
 document.querySelectorAll("[data-view]").forEach(b => b.onclick = () => setView(b.dataset.view));
 new ResizeObserver(() => { if (V) place(); }).observe(wrap);
 {
   const m = decodeURIComponent(location.hash.slice(1)).match(/^(d3|d2|both)\/(.+)$/);
-  if (m) setView(m[1], m[2]); else { setView("d3"); select("d3:midgaard", true); }
+  if (m) setView(m[1], m[2]); else setView("both");
 }
 if (document.fonts) document.fonts.ready.then(place);
 </script>

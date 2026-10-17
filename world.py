@@ -47,6 +47,11 @@ GAMES = {
                aggressive=re.compile(r"\bspecial\s+30\b")),  # SFUN_AGGRESSIVE
 }
 UNIT_FL_NO_MOB, UNIT_FL_SACRED = 0x0040, 0x0020
+ENTRY = ("udgaard", "temple")  # DEFAULT_ENTRY_ZONE/NAME in zon_basis: where players start and return after dying
+# Zones that hold commands, spells, boards and other machinery, not places to visit
+SYSTEM = {"basis", "basemove", "baseget", "baselook", "boards", "clans", "comm", "commands", "competition",
+          "death", "function", "g_q", "guild_paths", "guilds", "helpzon", "mail", "quests", "randomt",
+          "restrict", "set", "skills", "socials", "spells", "update", "wiz", "professions", "justice"}
 DIRS = ["n", "e", "s", "w", "u", "d", "ne", "nw", "se", "sw"]
 DVEC = {"n": (0, -1), "e": (1, 0), "s": (0, 1), "w": (-1, 0), "ne": (.71, -.71), "nw": (-.71, -.71),
         "se": (.71, .71), "sw": (-.71, .71), "u": (0, 0), "d": (0, 0)}
@@ -114,6 +119,14 @@ def plain(t):
     t = re.sub(r"<[^>]*>", "", t)
     t = re.sub(r"&(c\+?[a-z]|[a-z])", "", t)
     return re.sub(r"\s+", " ", t).strip()
+
+
+def pretty_title(title, zone):
+    """A zone without a real title ("hades3", "atl_sea") gets one a player can read: "Hades 3", "Atl Sea"."""
+    if title and title.lower() != zone.lower():
+        return title
+    t = re.sub(r"(?<=[a-z])(?=\d)", " ", (title or zone).replace("_", " "))
+    return " ".join(w[:1].upper() + w[1:] for w in t.split())
 
 
 def ref(target, zone):
@@ -254,7 +267,8 @@ def analyse(game, zones):
     for z, Z in zones.items():
         cands = []
         for r, R in Z["rooms"].items():
-            uniq = sorted({n.strip() for n in R["names"] if n.strip() and name_count[n.lower().strip()] == 1}, key=len)
+            uniq = sorted({n.strip() for n in R["names"] if n.strip() and name_count[n.lower().strip()] == 1
+                           and not re.fullmatch(r"[a-z ]*\d+", n.strip().lower())}, key=len)
             if not uniq or blocked((z, r)):
                 continue
             aggr = [m for m in loads_into.get((z, r), []) if m["aggressive"]]
@@ -294,7 +308,7 @@ def analyse(game, zones):
                 hit = k
                 break
             for d, ez, er, door in rooms[k]["exits"]:
-                if door and door[1]:
+                if door and (door[1] or door[2]):
                     continue
                 n, nc = (ez, er), c + (5 if door else 1)
                 if nc < dist.get(n, 1e9):
@@ -314,7 +328,49 @@ def analyse(game, zones):
         src = sources[k]
         Z["walk"] = dict(zone=src[0], name=src[1], steps=compress(steps), n=len(steps),
                          to=rooms[hit]["title"], to_room=hit[1])
+    routes_from_entry(zones, rooms)
     return rooms
+
+
+def routes_from_entry(zones, rooms):
+    """The walk from where players start to the nearest room of every zone it reaches:
+    fewest moves, a door counting as 5, never through a locked or hidden door."""
+    start = ENTRY if ENTRY in rooms else None
+    for Z in zones.values():
+        Z["route"] = None
+    if not start:
+        return
+    dist, prev, tick = {start: 0}, {start: None}, 0
+    heap = [(0, 0, start)]
+    first = {}
+    while heap:
+        c, _, k = heapq.heappop(heap)
+        if c > dist[k]:
+            continue
+        first.setdefault(k[0], k)
+        for d, ez, er, door in rooms[k]["exits"]:
+            if door and (door[1] or door[2]):
+                continue
+            n, nc = (ez, er), c + (5 if door else 1)
+            if nc < dist.get(n, 1e9):
+                dist[n], prev[n] = nc, (k, d, door)
+                tick += 1
+                heapq.heappush(heap, (nc, tick, n))
+    for z, hit in first.items():
+        if z == start[0] or z not in zones:
+            continue
+        steps, via, k = [], [], hit
+        while prev[k]:
+            k, d, door = prev[k]
+            steps.append(d)
+            if door:
+                steps.append("open " + door[0])
+            if k[0] != z and (not via or via[-1] != k[0]):
+                via.append(k[0])
+        steps.reverse()
+        via.reverse()
+        zones[z]["route"] = dict(steps=compress(steps), n=sum(1 for s in steps if not s.startswith("open ")),
+                                 via=[v for v in via if v != start[0]], to=rooms[hit]["title"])
 
 
 def compress(steps):
@@ -477,7 +533,8 @@ def build_view(view, games, match):
     def rooms_of(key):
         return max(len(games[g]["zones"][z]["rooms"]) for g, z in nodes[key])
     linked = {k for ab in edges for k in ab}
-    visible = {k for k in nodes if k in linked or rooms_of(k) >= 3}
+    visible = {k for k in nodes if (k in linked or rooms_of(k) >= 3)
+               and not all(z in SYSTEM for g, z in nodes[k])}
     size = {k: side(rooms_of(k)) for k in visible}
     lay_edges = []
     for (a, b), ex in edges.items():
@@ -538,9 +595,10 @@ def main():
                         to = games[game]["zones"][ez]["rooms"][er]
                         border.append(dict(r=r, t=R["title"], d=d, z=ez, tr=er, tt=to["title"]))
             out_zones[f"{game}:{z}"] = dict(
-                g=game, id=z, file=Z["file"], title=Z["title"] or z, creators=Z["creators"], years=Z["years"],
+                g=game, id=z, file=Z["file"], title=pretty_title(Z["title"], z), creators=Z["creators"], years=Z["years"],
                 notes=Z["notes"], rooms=len(Z["rooms"]), levels=Z["levels"], teleport=Z["teleport"],
-                walk=Z.get("walk"), blocked=Z["blocked_rooms"], named=Z["named_rooms"], border=border,
+                walk=Z.get("walk"), route=Z.get("route"), blocked=Z["blocked_rooms"],
+                valhalla=(game == "d3" or z in d3listed), named=Z["named_rooms"], border=border,
                 in_d3_list=(game == "d2" and z in d3listed and z not in games["d3"]["zones"]),
                 twin=(f"d3:{d2to3[z]}" if game == "d2" and z in d2to3 else
                       next((f"d2:{b}" for b, a in d2to3.items() if a == z), None) if game == "d3" else None))
@@ -574,6 +632,19 @@ def main():
             if e.get("cast") != name_now or (walk_now and e.get("walk") != walk_now):
                 continue  # checked something this build no longer suggests
             verified[k] = dict(ok=e["ok"], walk_ok=e.get("walk_ok"), walk_end=e.get("walk_end"), on=when)
+    # introductions: intros.json holds the reviewed ones (tools/review_sync.py); --drafts also
+    # shows the ones not yet reviewed, from tools/private/intros-work.json, for a local preview
+    intros = {}
+    if "--drafts" in sys.argv and os.path.exists(os.path.join(HERE, "tools/private/intros-work.json")):
+        for k, i in json.load(open(os.path.join(HERE, "tools/private/intros-work.json"))).items():
+            if i["status"] == "pending":
+                intros[k] = dict(intro=i["intro"], teaser=i["teaser"], draft=True)
+    if os.path.exists(os.path.join(HERE, "intros.json")):
+        intros.update(json.load(open(os.path.join(HERE, "intros.json"))))
+    for k, z in out_zones.items():
+        i = intros.get(k) or (intros.get(z["twin"]) if z["g"] == "d2" and z["twin"] else None)
+        if i:
+            z["intro"], z["teaser"], z["draft"] = i["intro"], i["teaser"], bool(i.get("draft"))
     data = dict(zones=out_zones, views=views, built=datetime.date.today().isoformat(), verified=verified,
                 counts={g: dict(zones=len(games[g]["zones"]), listed=len(games[g]["listed"])) for g in games})
     page = open(os.path.join(HERE, "world-template.html")).read()
