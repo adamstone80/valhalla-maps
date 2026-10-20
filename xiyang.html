@@ -1,0 +1,467 @@
+<title>Xiyang Room Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Alegreya+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a surveyor's chart sheet — header strip, the map as the sheet, a slim ledger column for the selected room. */
+:root {
+  --paper: #e9ecdf;      /* vellum, faintly green */
+  --sheet: #f4f6ee;
+  --ink: #1f2a24;        /* iron-gall ink */
+  --ink-soft: #56645b;
+  --rule: #b9c2b0;
+  --street: #2f5d4a;     /* city streets */
+  --inside: #8a6a3a;     /* buildings */
+  --open: #6b7d2e;       /* fields and hills */
+  --water: #2f6688;
+  --door: #a3402c;       /* oxide red */
+  --away: #8d6a12;       /* exits to other zones */
+  --hi: #d9a21b;
+  --line: #3d4a42;
+  --f-display: "IM Fell English SC", "Iowan Old Style", Georgia, serif;
+  --f-body: "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121815; --sheet: #18201c; --ink: #dfe6d8; --ink-soft: #97a597; --rule: #2e3a33;
+    --street: #6fb497; --inside: #d1a865; --open: #a9bf5c; --water: #6eaed6;
+    --door: #e0725c; --away: #e3b84a; --hi: #f2c14e; --line: #9fb0a4; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121815; --sheet: #18201c; --ink: #dfe6d8; --ink-soft: #97a597; --rule: #2e3a33;
+  --street: #6fb497; --inside: #d1a865; --open: #a9bf5c; --water: #6eaed6;
+  --door: #e0725c; --away: #e3b84a; --hi: #f2c14e; --line: #9fb0a4; color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 15px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 14px; box-sizing: border-box;
+  display: flex; flex-direction: column; gap: 12px;
+}
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
+h1 { font-family: var(--f-display); font-weight: 400; font-size: 1.9rem; margin: 0; letter-spacing: .02em; text-wrap: balance; }
+.meta { color: var(--ink-soft); font-size: .9rem; font-variant-numeric: tabular-nums; }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-left: auto; }
+input[type=search] {
+  font: inherit; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 4px;
+  background: var(--sheet); color: var(--ink); width: 15rem; max-width: 100%;
+}
+button, label.tog {
+  font: 500 .88rem var(--f-body); padding: 6px 10px; border: 1px solid var(--rule); border-radius: 4px;
+  background: var(--sheet); color: var(--ink); cursor: pointer; display: inline-flex; gap: 6px; align-items: center;
+}
+button:hover, label.tog:hover { border-color: var(--ink-soft); }
+:focus-visible { outline: 2px solid var(--hi); outline-offset: 2px; }
+main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 19rem; gap: 12px; }
+#wrap {
+  position: relative; min-height: 0; min-width: 0; background: var(--sheet);
+  border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; touch-action: none; cursor: grab;
+}
+#wrap.drag { cursor: grabbing; }
+svg { width: 100%; height: 100%; display: block; user-select: none; }
+.zoom { position: absolute; right: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 6px; }
+.zoom button { width: 34px; height: 34px; justify-content: center; font-size: 1.1rem; padding: 0; }
+aside {
+  min-width: 0; overflow: auto; background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 14px 16px; display: flex; flex-direction: column; gap: 14px;
+}
+aside h2 { font-family: var(--f-display); font-weight: 400; font-size: 1.35rem; margin: 0; text-wrap: balance; }
+.eyebrow { font: 500 .72rem var(--f-body); text-transform: uppercase; letter-spacing: .09em; color: var(--ink-soft); }
+.id { font-family: var(--f-mono); font-size: .8rem; color: var(--ink-soft); word-break: break-all; }
+ul.exits { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+ul.exits li { display: grid; grid-template-columns: 3.4rem minmax(0,1fr); gap: 8px; align-items: baseline; }
+ul.exits .dir { font: 500 .78rem var(--f-mono); text-transform: uppercase; color: var(--ink-soft); }
+ul.exits button { all: unset; cursor: pointer; color: var(--street); text-decoration: underline; text-underline-offset: 2px; }
+ul.exits button:focus-visible { outline: 2px solid var(--hi); }
+.tag { font: 500 .72rem var(--f-body); padding: 1px 6px; border-radius: 3px; border: 1px solid currentColor; margin-left: 6px; }
+.tag.door { color: var(--door); } .tag.away { color: var(--away); } .tag.oneway { color: var(--ink-soft); }
+.legend { display: grid; grid-template-columns: 1.4rem minmax(0,1fr); gap: 6px 8px; align-items: center; font-size: .88rem; }
+.legend svg { width: 1.4rem; height: 1rem; }
+.hint { color: var(--ink-soft); font-size: .85rem; line-height: 1.45; margin: 0; }
+.hint a { color: var(--street); text-underline-offset: 2px; }
+#results { display: flex; flex-direction: column; gap: 2px; }
+#results button { all: unset; cursor: pointer; padding: 3px 4px; border-radius: 3px; }
+#results button:hover, #results button:focus-visible { background: var(--paper); }
+
+/* map drawing */
+.edge { stroke: var(--line); stroke-width: 1.6; fill: none; opacity: .8; vector-effect: non-scaling-stroke; }
+.edge.vert { stroke-dasharray: 6 5; }
+.edge.away { stroke: var(--away); stroke-dasharray: 3 4; }
+.doorTick { stroke: var(--door); stroke-width: 3; vector-effect: non-scaling-stroke; }
+.node { stroke: var(--sheet); stroke-width: 1.5; cursor: pointer; vector-effect: non-scaling-stroke; }
+.node.city { fill: var(--street); } .node.inside { fill: var(--inside); }
+.node.field, .node.hills { fill: var(--open); } .node.water_swim { fill: var(--water); } .node.other { fill: var(--ink-soft); }
+.lbl { font-family: var(--f-body); fill: var(--ink); paint-order: stroke; stroke: var(--sheet); stroke-linejoin: round; pointer-events: none; }
+.vmark { font-family: var(--f-mono); font-weight: 700; fill: var(--ink-soft); pointer-events: none; }
+.awayLbl { font-family: var(--f-mono); font-weight: 500; fill: var(--away); paint-order: stroke; stroke: var(--sheet); stroke-linejoin: round; pointer-events: none; }
+.lbl.off, .awayLbl.off, .vmark.off { display: none; }
+.g-room:hover .lbl.off, .g-room:focus-visible .lbl.off, .g-room.sel .lbl.off { display: inline; }
+.g-room:hover .lbl, .g-room:focus-visible .lbl { fill: var(--street); }
+.g-room:focus { outline: none; } /* the ring on the dot shows focus instead of a box */
+.g-room:focus-visible .node { stroke: var(--hi); stroke-width: 4; }
+.g-room.sel .node { stroke: var(--hi); stroke-width: 4; }
+.g-room.match .node { stroke: var(--hi); stroke-width: 3.5; }
+.g-room.sel .lbl { font-weight: 700; }
+#backdrop { opacity: 0; transition: opacity .25s; }
+.showimg #backdrop { opacity: .55; }
+@media (prefers-reduced-motion: reduce) { #backdrop { transition: none; } }
+@media (max-width: 760px) {
+  main { grid-template-columns: minmax(0,1fr); grid-template-rows: 62vh auto; }
+  body { height: auto; }
+  input[type=search] { width: 100%; }
+  .tools { margin-left: 0; width: 100%; }
+}
+</style>
+
+<header>
+  <h1>Xiyang</h1>
+  <span class="meta" id="meta"></span>
+  <div class="tools">
+    <input type="search" id="q" placeholder="Find a room, e.g. harbor" aria-label="Find a room">
+    <button id="fit" type="button">Show everything</button>
+  </div>
+</header>
+
+<main>
+  <div id="wrap" aria-label="Map of Xiyang rooms. Drag to move, scroll or pinch to zoom.">
+    <svg id="svg" role="img" aria-label="Xiyang rooms and exits">
+      <g id="vp">
+        <g id="edges"></g><g id="nodes"></g>
+      </g>
+    </svg>
+    <div class="zoom">
+      <button type="button" id="zin" aria-label="Zoom in">+</button>
+      <button type="button" id="zout" aria-label="Zoom out">−</button>
+    </div>
+  </div>
+  <aside id="side">
+    <div id="detail">
+      <div class="eyebrow">Room</div>
+      <h2>Pick a room</h2>
+      <p class="hint">Click any dot on the map, or search above. Drag to move around; scroll, pinch or use + and − to zoom. Names that don't fit appear as you zoom in, or when you point at a room.</p>
+    </div>
+    <div id="results" hidden></div>
+    <div>
+      <div class="eyebrow" style="margin-bottom:8px">Key</div>
+      <div class="legend">
+        <svg viewBox="0 0 22 16"><circle cx="11" cy="8" r="5" fill="var(--street)"/></svg><span>Street or square</span>
+        <svg viewBox="0 0 22 16"><circle cx="11" cy="8" r="5" fill="var(--inside)"/></svg><span>Inside a building</span>
+        <svg viewBox="0 0 22 16"><circle cx="11" cy="8" r="5" fill="var(--open)"/></svg><span>Fields and hills</span>
+        <svg viewBox="0 0 22 16"><line x1="1" y1="8" x2="21" y2="8" stroke="var(--line)" stroke-width="2"/></svg><span>Exit between rooms</span>
+        <svg viewBox="0 0 22 16"><line x1="1" y1="8" x2="21" y2="8" stroke="var(--line)" stroke-width="2"/><line x1="11" y1="3" x2="11" y2="13" stroke="var(--door)" stroke-width="3"/></svg><span>Door</span>
+        <svg viewBox="0 0 22 16"><line x1="1" y1="8" x2="21" y2="8" stroke="var(--line)" stroke-width="2" stroke-dasharray="4 3"/></svg><span>Up or down</span>
+        <svg viewBox="0 0 22 16"><line x1="1" y1="8" x2="21" y2="8" stroke="var(--away)" stroke-width="2" stroke-dasharray="2 3"/></svg><span>Leads to another zone</span>
+      </div>
+    </div>
+    <p class="hint">These zones have no map positions in the game, so rooms are laid out from their exits: north is up, east is right. Where the city's streets bend, the picture bends too.</p>
+    <p class="hint">Rooms and exits come from the <a href="https://github.com/Seifert69/DikuMUD2">DikuMUD II</a> zones xiyang, xiyang2 and oxiyang (the Xiyang of Valhalla's source may differ). An unofficial fan map: the game itself is the final word. <a href="world.html">Every zone and how they connect →</a></p>
+  </aside>
+</main>
+
+<script>
+const ROOMS = [{"id":"city_rd1@xiyang","t":"XiYang Entrance","s":"city","e":[{"d":"n","to":"city_sq1@xiyang","z":"home"},{"d":"s","to":"causeway_3@outxiyang","z":"outxiyang"}],"x":-26,"y":182},{"id":"city_sq1@xiyang","t":"The Square of the Pagoda","s":"city","e":[{"d":"n","to":"city_rd2@xiyang","z":"home"},{"d":"e","to":"city_rd4@xiyang","z":"home"},{"d":"w","to":"city_rd5@xiyang","z":"home"},{"d":"s","to":"city_rd1@xiyang","z":"home"}],"x":0,"y":130},{"id":"city_rd2@xiyang","t":"Heaven's way","s":"city","e":[{"d":"n","to":"city_rd3@xiyang","z":"home"},{"d":"s","to":"city_sq1@xiyang","z":"home"},{"d":"e","to":"grocer@xiyang2","z":"home"}],"x":26,"y":156},{"id":"city_rd3@xiyang","t":"Heaven's way","s":"city","e":[{"d":"n","to":"gate1@xiyang2","z":"home"},{"d":"s","to":"city_rd2@xiyang","z":"home"}],"x":0,"y":182},{"id":"city_rd4@xiyang","t":"Eastern Sunway","s":"city","e":[{"d":"e","to":"city_rd6@xiyang","z":"home"},{"d":"w","to":"city_sq1@xiyang","z":"home"}],"x":26,"y":130},{"id":"city_rd5@xiyang","t":"Western Sunway","s":"city","e":[{"d":"e","to":"city_sq1@xiyang","z":"home"},{"d":"w","to":"city_rd7@xiyang","z":"home"},{"d":"n","to":"inn2@xiyang","z":"home"},{"d":"s","to":"lib1@xiyang","z":"home"}],"x":-26,"y":130},{"id":"city_rd6@xiyang","t":"Eastern Sunway","s":"city","e":[{"d":"n","to":"pets_old@xiyang2","z":"home"},{"d":"w","to":"city_rd4@xiyang","z":"home"},{"d":"e","to":"city_rd35@xiyang","z":"home"}],"x":52,"y":130},{"id":"city_rd7@xiyang","t":"Western Sunway","s":"city","e":[{"d":"e","to":"city_rd5@xiyang","z":"home"},{"d":"w","to":"city_rd8@xiyang","z":"home"},{"d":"n","to":"first_floor@xiyang","z":"home"}],"x":-52,"y":130},{"id":"city_rd8@xiyang","t":"Western Sunway","s":"city","e":[{"d":"n","to":"city_rd21@xiyang","z":"home"},{"d":"e","to":"city_rd7@xiyang","z":"home"},{"d":"w","to":"city_rd9@xiyang","z":"home"}],"x":-78,"y":130},{"id":"city_rd9@xiyang","t":"Western Sunway","s":"city","e":[{"d":"e","to":"city_rd8@xiyang","z":"home"},{"d":"w","to":"city_rd10@xiyang","z":"home"},{"d":"n","to":"entrance_chapel@xiyang2","z":"home"}],"x":-104,"y":130},{"id":"city_rd10@xiyang","t":"Western Sunway","s":"city","e":[{"d":"e","to":"city_rd9@xiyang","z":"home"},{"d":"w","to":"city_rd11@xiyang","z":"home"},{"d":"n","to":"winehou2@xiyang","z":"home"}],"x":-130,"y":130},{"id":"city_rd11@xiyang","t":"Western Sunway","s":"city","e":[{"d":"n","to":"city_rd12@xiyang","z":"home"},{"d":"e","to":"city_rd10@xiyang","z":"home"}],"x":-182,"y":104},{"id":"city_rd12@xiyang","t":"Fire Path","s":"city","e":[{"d":"s","to":"city_rd11@xiyang","z":"home"},{"d":"n","to":"city_rd13@xiyang","z":"home"},{"d":"e","to":"bh_connect@xiyang","z":"home"}],"x":-156,"y":104},{"id":"city_rd13@xiyang","t":"Fire Path","s":"city","e":[{"d":"n","to":"city_rd14@xiyang","z":"home"},{"d":"e","to":"city_rd16@xiyang","z":"home"},{"d":"s","to":"city_rd12@xiyang","z":"home"}],"x":-156,"y":78},{"id":"city_rd14@xiyang","t":"Fire Path","s":"city","e":[{"d":"n","to":"city_rd15@xiyang","z":"home"},{"d":"s","to":"city_rd13@xiyang","z":"home"}],"x":-156,"y":52},{"id":"city_rd15@xiyang","t":"Dragons Eye Way","s":"city","e":[{"d":"s","to":"city_rd14@xiyang","z":"home"},{"d":"e","to":"city_rd23@xiyang","z":"home"}],"x":-156,"y":26},{"id":"city_rd16@xiyang","t":"Cresent","s":"city","e":[{"d":"w","to":"city_rd13@xiyang","z":"home"},{"d":"e","to":"city_rd17@xiyang","z":"home"},{"d":"n","to":"oldhou2@xiyang","z":"home"},{"d":"s","to":"bank@xiyang","z":"home"}],"x":-130,"y":78},{"id":"city_rd17@xiyang","t":"Cresent","s":"city","e":[{"d":"n","to":"police@xiyang","z":"home"},{"d":"s","to":"mayor_off@xiyang","z":"home"},{"d":"w","to":"city_rd16@xiyang","z":"home"},{"d":"e","to":"city_rd18@xiyang","z":"home"}],"x":-104,"y":78},{"id":"city_rd18@xiyang","t":"Cresent","s":"city","e":[{"d":"n","to":"city_rd22@xiyang","z":"home"},{"d":"s","to":"city_rd21@xiyang","z":"home"},{"d":"w","to":"city_rd17@xiyang","z":"home"},{"d":"e","to":"city_rd19@xiyang","z":"home"}],"x":-78,"y":78},{"id":"city_rd19@xiyang","t":"Cresent","s":"city","e":[{"d":"w","to":"city_rd18@xiyang","z":"home"},{"d":"e","to":"city_rd20@xiyang","z":"home"},{"d":"n","to":"temple2@xiyang","z":"home"}],"x":-52,"y":78},{"id":"city_rd20@xiyang","t":"Cresent","s":"city","e":[{"d":"n","to":"med_room@xiyang2","z":"home"},{"d":"w","to":"city_rd19@xiyang","z":"home"}],"x":-26,"y":78},{"id":"city_rd21@xiyang","t":"Earth's Path","s":"city","e":[{"d":"n","to":"city_rd18@xiyang","z":"home"},{"d":"e","to":"courtrm@xiyang","z":"home"},{"d":"s","to":"city_rd8@xiyang","z":"home"}],"x":-78,"y":104},{"id":"city_rd22@xiyang","t":"Earth's Path","s":"city","e":[{"d":"n","to":"city_rd25@xiyang","z":"home"},{"d":"s","to":"city_rd18@xiyang","z":"home"}],"x":-78,"y":52},{"id":"city_rd23@xiyang","t":"Dragons Eye Way","s":"city","e":[{"d":"w","to":"city_rd15@xiyang","z":"home"},{"d":"e","to":"city_rd24@xiyang","z":"home"}],"x":-130,"y":26},{"id":"city_rd24@xiyang","t":"Dragons Eye Way","s":"city","e":[{"d":"w","to":"city_rd23@xiyang","z":"home"},{"d":"e","to":"city_rd25@xiyang","z":"home"}],"x":-104,"y":26},{"id":"city_rd25@xiyang","t":"Dragons Eye Way","s":"city","e":[{"d":"w","to":"city_rd24@xiyang","z":"home"},{"d":"e","to":"city_rd26@xiyang","z":"home"},{"d":"s","to":"city_rd22@xiyang","z":"home"}],"x":-78,"y":26},{"id":"city_rd26@xiyang","t":"Dragons Eye Way","s":"city","e":[{"d":"w","to":"city_rd25@xiyang","z":"home"},{"d":"e","to":"city_rd27@xiyang","z":"home"},{"d":"s","to":"uiger_pub@xiyang","z":"home"}],"x":-52,"y":26},{"id":"city_rd27@xiyang","t":"Dragons Eye Way","s":"city","e":[{"d":"w","to":"city_rd26@xiyang","z":"home"},{"d":"e","to":"city_rd28@xiyang","z":"home"}],"x":-26,"y":26},{"id":"city_rd28@xiyang","t":"Twin Dragon Gates","s":"city","e":[{"d":"w","to":"city_rd27@xiyang","z":"home"},{"d":"e","to":"city_rd29@xiyang","z":"home"},{"d":"n","to":"dock_enter@xiyang2","z":"home"}],"x":0,"y":26},{"id":"city_rd29@xiyang","t":"Dragons Eye Way","s":"city","e":[{"d":"w","to":"city_rd28@xiyang","z":"home"},{"d":"e","to":"city_rd30@xiyang","z":"home"}],"x":26,"y":26},{"id":"city_rd30@xiyang","t":"Dragons Eye Way","s":"city","e":[{"d":"w","to":"city_rd29@xiyang","z":"home"},{"d":"e","to":"city_rd31@xiyang","z":"home"}],"x":52,"y":26},{"id":"city_rd31@xiyang","t":"Dragons Eye Way","s":"city","e":[{"d":"w","to":"city_rd30@xiyang","z":"home"},{"d":"e","to":"city_rd32@xiyang","z":"home"},{"d":"s","to":"city_rd44@xiyang","z":"home"}],"x":78,"y":26},{"id":"city_rd32@xiyang","t":"Dragons Eye Way","s":"city","e":[{"d":"w","to":"city_rd31@xiyang","z":"home"},{"d":"e","to":"city_rd33@xiyang","z":"home"}],"x":104,"y":26},{"id":"city_rd33@xiyang","t":"Dragons Eye Way","s":"city","e":[{"d":"w","to":"city_rd32@xiyang","z":"home"},{"d":"e","to":"city_rd34@xiyang","z":"home"}],"x":130,"y":26},{"id":"city_rd34@xiyang","t":"Dragons Eye Way","s":"city","e":[{"d":"w","to":"city_rd33@xiyang","z":"home"},{"d":"s","to":"city_rd41@xiyang","z":"home"}],"x":156,"y":26},{"id":"city_rd35@xiyang","t":"Eastern Sunway","s":"city","e":[{"d":"w","to":"city_rd6@xiyang","z":"home"},{"d":"e","to":"city_rd36@xiyang","z":"home"},{"d":"n","to":"city_rd42@xiyang","z":"home"}],"x":78,"y":130},{"id":"city_rd36@xiyang","t":"Eastern Sunway","s":"city","e":[{"d":"w","to":"city_rd35@xiyang","z":"home"},{"d":"n","to":"taylor_ent@xiyang2","z":"home"},{"d":"e","to":"city_rd37@xiyang","z":"home"}],"x":104,"y":130},{"id":"city_rd37@xiyang","t":"Eastern Sunway","s":"city","e":[{"d":"w","to":"city_rd36@xiyang","z":"home"},{"d":"e","to":"city_rd38@xiyang","z":"home"},{"d":"n","to":"tat1@xiyang2","z":"home"}],"x":104,"y":156},{"id":"city_rd38@xiyang","t":"Eastern Sunway","s":"city","e":[{"d":"w","to":"city_rd37@xiyang","z":"home"},{"d":"n","to":"city_rd39@xiyang","z":"home"}],"x":156,"y":130},{"id":"city_rd39@xiyang","t":"Spirit Path","s":"city","e":[{"d":"n","to":"city_rd40@xiyang","z":"home"},{"d":"s","to":"city_rd38@xiyang","z":"home"}],"x":156,"y":104},{"id":"city_rd40@xiyang","t":"Spirit Path","s":"city","e":[{"d":"n","to":"city_rd41@xiyang","z":"home"},{"d":"s","to":"city_rd39@xiyang","z":"home"},{"d":"w","to":"city_rd48@xiyang","z":"home"}],"x":156,"y":78},{"id":"city_rd41@xiyang","t":"Spirit Path","s":"city","e":[{"d":"n","to":"city_rd34@xiyang","z":"home"},{"d":"s","to":"city_rd40@xiyang","z":"home"}],"x":156,"y":52},{"id":"city_rd42@xiyang","t":"Water Path","s":"city","e":[{"d":"n","to":"city_rd43@xiyang","z":"home"},{"d":"w","to":"artroom_1@xiyang","z":"home"},{"d":"s","to":"city_rd35@xiyang","z":"home"}],"x":78,"y":104},{"id":"city_rd43@xiyang","t":"Cresent","s":"city","e":[{"d":"n","to":"city_rd44@xiyang","z":"home"},{"d":"s","to":"city_rd42@xiyang","z":"home"},{"d":"e","to":"city_rd47@xiyang","z":"home"},{"d":"w","to":"city_rd45@xiyang","z":"home"}],"x":78,"y":78},{"id":"city_rd44@xiyang","t":"Water Path","s":"city","e":[{"d":"n","to":"city_rd31@xiyang","z":"home"},{"d":"s","to":"city_rd43@xiyang","z":"home"},{"d":"w","to":"mailroom@xiyang","z":"home"},{"d":"e","to":"parcel_room@xiyang","z":"home"}],"x":78,"y":52},{"id":"city_rd45@xiyang","t":"Cresent","s":"city","e":[{"d":"n","to":"comms_shop1@xiyang2","z":"home"},{"d":"e","to":"city_rd43@xiyang","z":"home"},{"d":"w","to":"city_rd46@xiyang","z":"home"}],"x":52,"y":78},{"id":"city_rd46@xiyang","t":"Cresent","s":"city","e":[{"d":"e","to":"city_rd45@xiyang","z":"home"},{"d":"n","to":"music_hall@xiyang","z":"home"}],"x":26,"y":78},{"id":"city_rd47@xiyang","t":"Cresent","s":"city","e":[{"d":"n","to":"armor_room@xiyang","z":"home"},{"d":"e","to":"city_rd48@xiyang","z":"home"},{"d":"s","to":"weapon_room@xiyang","z":"home"},{"d":"w","to":"city_rd43@xiyang","z":"home"}],"x":104,"y":78},{"id":"city_rd48@xiyang","t":"Cresent","s":"city","e":[{"d":"e","to":"city_rd40@xiyang","z":"home"},{"d":"w","to":"city_rd47@xiyang","z":"home"},{"d":"n","to":"dojo_garden@xiyang","z":"home"},{"d":"s","to":"stone_cut@xiyang2","z":"home"}],"x":130,"y":78},{"id":"music_hall@xiyang","t":"The Ancient Music Halls","s":"city","e":[{"d":"s","to":"city_rd46@xiyang","z":"home"}],"x":-26,"y":0},{"id":"stone_cut@xiyang","t":"Stone Cutters, Inc","s":"city","e":[{"d":"n","to":"city_rd48@xiyang","z":"home"}],"x":130,"y":130},{"id":"dojo_garden@xiyang","t":"Entrance to The Garden of The Dojo","s":"city","e":[{"d":"s","to":"city_rd48@xiyang","z":"home"},{"d":"n","to":"dojo_pra@xiyang","z":"home"},{"d":"e","to":"dojo@xiyang","z":"home"}],"x":78,"y":0},{"id":"dojo_pra@xiyang","t":"The Dojo Practice Room","s":"city","e":[{"d":"s","to":"dojo_garden@xiyang","z":"home"}],"x":52,"y":0},{"id":"dojo@xiyang","t":"The Dojo","s":"city","e":[{"d":"w","to":"dojo_garden@xiyang","z":"home"},{"d":"e","to":"dojo_1@xiyang","z":"home"},{"d":"s","to":"dojo_2@xiyang","z":"home"}],"x":104,"y":0},{"id":"dojo_1@xiyang","t":"The Dojo","s":"city","e":[{"d":"w","to":"dojo@xiyang","z":"home"},{"d":"s","to":"dojo_3@xiyang","z":"home"}],"x":130,"y":0},{"id":"dojo_2@xiyang","t":"The Dojo","s":"city","e":[{"d":"e","to":"dojo_3@xiyang","z":"home"},{"d":"n","to":"dojo@xiyang","z":"home"}],"x":156,"y":0},{"id":"dojo_3@xiyang","t":"The Dojo","s":"city","e":[{"d":"w","to":"dojo_2@xiyang","z":"home"},{"d":"n","to":"dojo_1@xiyang","z":"home"}],"x":182,"y":-26},{"id":"lib1@xiyang","t":"The gates of the Imperial Library","s":"city","e":[{"d":"s","to":"lib2@xiyang","z":"home"},{"d":"n","to":"city_rd5@xiyang","z":"home"}],"x":-26,"y":156},{"id":"lib2@xiyang","t":"Walkway leading to the Imperial Library","s":"city","e":[{"d":"s","to":"lib3@xiyang","z":"home"},{"d":"n","to":"lib1@xiyang","z":"home"}],"x":-52,"y":182},{"id":"lib3@xiyang","t":"The Imperial Library's Reception","s":"inside","e":[{"d":"s","to":"lib4@xiyang","z":"home"},{"d":"n","to":"lib2@xiyang","z":"home"},{"d":"e","to":"lib5@xiyang","z":"home"},{"d":"w","to":"lib6@xiyang","z":"home"}],"x":-52,"y":208},{"id":"lib4@xiyang","t":"The Imperial Library","s":"inside","e":[{"d":"n","to":"lib3@xiyang","z":"home"}],"x":-52,"y":234},{"id":"lib5@xiyang","t":"The Imperial Library","s":"inside","e":[{"d":"w","to":"lib3@xiyang","z":"home"}],"x":0,"y":234},{"id":"lib6@xiyang","t":"The Imperial Library","s":"inside","e":[{"d":"e","to":"lib3@xiyang","z":"home"}],"x":-104,"y":234},{"id":"oldhou2@xiyang","t":"Weapons Masters Courtyard","s":"city","e":[{"d":"n","to":"oldhou3@xiyang","z":"home"},{"d":"s","to":"city_rd16@xiyang","z":"home"}],"x":-130,"y":52},{"id":"oldhou3@xiyang","t":"The Master's House","s":"city","e":[{"d":"s","to":"oldhou2@xiyang","z":"home"}],"x":-156,"y":0},{"id":"winehou2@xiyang","t":"The Wine House","s":"inside","e":[{"d":"u","to":"winehou3@xiyang","z":"home"},{"d":"s","to":"city_rd10@xiyang","z":"home"}],"x":-182,"y":78},{"id":"winehou3@xiyang","t":"The drinking room","s":"inside","e":[{"d":"d","to":"winehou2@xiyang","z":"home"}],"x":-208,"y":26},{"id":"inn2@xiyang","t":"The Reception in the Golden Dragon","s":"inside","e":[{"d":"e","to":"inn_rest@xiyang","z":"home"},{"d":"s","to":"city_rd5@xiyang","z":"home"},{"d":"n","to":"inn3@xiyang","z":"home"}],"x":-78,"y":156},{"id":"inn_rest@xiyang","t":"Golden Dragon Foods","s":"inside","e":[{"d":"w","to":"inn2@xiyang","z":"home"}],"x":-78,"y":182},{"id":"inn3@xiyang","t":"Hallway in the Golden Dragon","s":"inside","e":[{"d":"s","to":"inn2@xiyang","z":"home"},{"d":"e","to":"inn_rm1@xiyang","z":"home","door":true},{"d":"w","to":"inn_rm2@xiyang","z":"home","door":true},{"d":"n","to":"inn_rm3@xiyang","z":"home","door":true},{"d":"u","to":"inn4@xiyang","z":"home"}],"x":-130,"y":156},{"id":"inn4@xiyang","t":"Hallway in the Golden Dragon","s":"inside","e":[{"d":"d","to":"inn3@xiyang","z":"home"},{"d":"s","to":"inn_rm4@xiyang","z":"home","door":true},{"d":"e","to":"inn_rm5@xiyang","z":"home","door":true},{"d":"n","to":"inn_rm6@xiyang","z":"home","door":true}],"x":-104,"y":182},{"id":"inn_rm6@xiyang","t":"The Grand Dragon Suite","s":"inside","e":[{"d":"s","to":"inn4@xiyang","z":"home","door":true}],"x":-156,"y":182},{"id":"inn_rm5@xiyang","t":"The Gesha Suite","s":"inside","e":[{"d":"w","to":"inn4@xiyang","z":"home","door":true}],"x":-78,"y":208},{"id":"inn_rm4@xiyang","t":"The Samuri Suite","s":"inside","e":[{"d":"n","to":"inn4@xiyang","z":"home","door":true}],"x":-104,"y":208},{"id":"inn_rm3@xiyang","t":"The Jasmine Suite","s":"inside","e":[{"d":"s","to":"inn3@xiyang","z":"home","door":true}],"x":-182,"y":156},{"id":"inn_rm1@xiyang","t":"The Lotus Suite","s":"inside","e":[{"d":"w","to":"inn3@xiyang","z":"home","door":true}],"x":-130,"y":182},{"id":"inn_rm2@xiyang","t":"The Orchid Suite","s":"inside","e":[{"d":"e","to":"inn3@xiyang","z":"home","door":true}],"x":-156,"y":156},{"id":"temple2@xiyang","t":"The courtyard of the Most High","s":"inside","e":[{"d":"n","to":"temple3@xiyang","z":"home"},{"d":"e","to":"temple4@xiyang","z":"home"},{"d":"s","to":"city_rd19@xiyang","z":"home"},{"d":"w","to":"monk_rest@xiyang","z":"home"}],"x":-26,"y":52},{"id":"monk_rest@xiyang","t":"Monks Rest Area","s":"","e":[{"d":"e","to":"temple2@xiyang","z":"home"}],"x":-104,"y":0},{"id":"temple3@xiyang","t":"The Temple of the Most High","s":"inside","e":[{"d":"s","to":"temple2@xiyang","z":"home"}],"x":-52,"y":0},{"id":"temple4@xiyang","t":"The Temple of the Most High","s":"inside","e":[{"d":"w","to":"temple2@xiyang","z":"home"}],"x":0,"y":78},{"id":"jail@xiyang","t":"The Xiyang City jail","s":"inside","e":[{"d":"s","to":"police@xiyang","z":"home","door":true}],"x":-130,"y":0},{"id":"police@xiyang","t":"Xiyang City Guards' Headquarters","s":"inside","e":[{"d":"s","to":"city_rd17@xiyang","z":"home"},{"d":"n","to":"jail@xiyang","z":"home","door":true}],"x":-104,"y":52},{"id":"bank@xiyang","t":"Xiyang City bank","s":"inside","e":[{"d":"n","to":"city_rd16@xiyang","z":"home"}],"x":-130,"y":104},{"id":"uiger_pub@xiyang","t":"Uiger's Pub","s":"inside","e":[{"d":"n","to":"city_rd26@xiyang","z":"home"}],"x":-52,"y":52},{"id":"mayor_off@xiyang","t":"The Mayor's Office","s":"inside","e":[{"d":"n","to":"city_rd17@xiyang","z":"home"}],"x":-104,"y":104},{"id":"artroom_1@xiyang","t":"The Paintings Showcase","s":"inside","e":[{"d":"e","to":"city_rd42@xiyang","z":"home"},{"d":"w","to":"artroom_2@xiyang","z":"home"}],"x":52,"y":104},{"id":"artroom_2@xiyang","t":"The Statue Room","s":"inside","e":[{"d":"e","to":"artroom_1@xiyang","z":"home"}],"x":26,"y":104},{"id":"courtrm@xiyang","t":"The Courthouse","s":"inside","e":[{"d":"w","to":"city_rd21@xiyang","z":"home"}],"x":-52,"y":104},{"id":"armor_room@xiyang","t":"Sacred Armoury","s":"inside","e":[{"d":"s","to":"city_rd47@xiyang","z":"home"}],"x":130,"y":52},{"id":"mailroom@xiyang","t":"The Mail Office of Xiyang","s":"inside","e":[{"d":"e","to":"city_rd44@xiyang","z":"home"}],"x":52,"y":52},{"id":"weapon_room@xiyang","t":"Sacred Weapons","s":"inside","e":[{"d":"n","to":"city_rd47@xiyang","z":"home"}],"x":104,"y":104},{"id":"parcel_room@xiyang","t":"Xiyang Parcel Office","s":"city","e":[{"d":"w","to":"city_rd44@xiyang","z":"home"}],"x":104,"y":52},{"id":"bh_connect@xiyang","t":"Bountyhunter Guild Yard","s":"inside","e":[{"d":"n","to":"bh_recept@xiyang","z":"home"},{"d":"s","to":"bh_sell@xiyang","z":"home"},{"d":"e","to":"bh_board@xiyang","z":"home"},{"d":"w","to":"city_rd12@xiyang","z":"home"}],"x":-182,"y":52},{"id":"bh_recept@xiyang","t":"Bounty hunter Guild Training Room","s":"inside","e":[{"d":"s","to":"bh_connect@xiyang","z":"home"}],"x":-182,"y":26},{"id":"bh_sell@xiyang","t":"Bountyhunter Guild Contract Shop","s":"inside","e":[{"d":"n","to":"bh_connect@xiyang","z":"home"}],"x":-208,"y":52},{"id":"bh_board@xiyang","t":"Bountyhunter Guild Information Centre","s":"inside","e":[{"d":"w","to":"bh_connect@xiyang","z":"home"}],"x":-208,"y":0},{"id":"first_floor@xiyang","t":"The Wedding Shop - The Bride's Department","s":"inside","e":[{"d":"u","to":"second_floor@xiyang","z":"home"},{"d":"n","to":"jeweler@xiyang","z":"home"},{"d":"e","to":"gift_shop@xiyang","z":"home"},{"d":"s","to":"city_rd7@xiyang","z":"home"}],"x":-26,"y":104},{"id":"second_floor@xiyang","t":"2nd floor - The Groom's Department","s":"inside","e":[{"d":"d","to":"first_floor@xiyang","z":"home"}],"x":-52,"y":156},{"id":"jeweler@xiyang","t":"A small Jeweler Department","s":"inside","e":[{"d":"s","to":"first_floor@xiyang","z":"home"}],"x":-104,"y":156},{"id":"gift_shop@xiyang","t":"A small gift shop","s":"inside","e":[{"d":"w","to":"first_floor@xiyang","z":"home"}],"x":0,"y":156},{"id":"dock_enter@xiyang2","t":"At entrance of the Xiyang Harbor","s":"city","e":[{"d":"n","to":"dock7@xiyang2","z":"home"},{"d":"s","to":"city_rd28@xiyang","z":"home"}],"x":0,"y":0},{"id":"dock6@xiyang2","t":"On the dock","s":"city","e":[{"d":"w","to":"dock5@xiyang2","z":"home"},{"d":"e","to":"dock7@xiyang2","z":"home"}],"x":-26,"y":-26},{"id":"dock5@xiyang2","t":"On the dock","s":"city","e":[{"d":"w","to":"dock4@xiyang2","z":"home"},{"d":"e","to":"dock6@xiyang2","z":"home"}],"x":-52,"y":-26},{"id":"dock4@xiyang2","t":"On the dock","s":"city","e":[{"d":"w","to":"dock3@xiyang2","z":"home"},{"d":"e","to":"dock5@xiyang2","z":"home"}],"x":-78,"y":-26},{"id":"dock3@xiyang2","t":"On the dock","s":"city","e":[{"d":"w","to":"dock2@xiyang2","z":"home"},{"d":"e","to":"dock4@xiyang2","z":"home"}],"x":-104,"y":-26},{"id":"dock2@xiyang2","t":"On the dock","s":"city","e":[{"d":"w","to":"dock1@xiyang2","z":"home"},{"d":"e","to":"dock3@xiyang2","z":"home"}],"x":-130,"y":-26},{"id":"dock1@xiyang2","t":"On the dock","s":"city","e":[{"d":"e","to":"dock2@xiyang2","z":"home"}],"x":-156,"y":-26},{"id":"dock7@xiyang2","t":"On the dock","s":"city","e":[{"d":"w","to":"dock6@xiyang2","z":"home"},{"d":"e","to":"dock8@xiyang2","z":"home"},{"d":"s","to":"dock_enter@xiyang2","z":"home"}],"x":0,"y":-26},{"id":"dock8@xiyang2","t":"On the dock","s":"city","e":[{"d":"w","to":"dock7@xiyang2","z":"home"},{"d":"e","to":"dock9@xiyang2","z":"home"}],"x":26,"y":-26},{"id":"dock9@xiyang2","t":"On the dock","s":"city","e":[{"d":"w","to":"dock8@xiyang2","z":"home"},{"d":"e","to":"dock10@xiyang2","z":"home"}],"x":52,"y":-26},{"id":"dock10@xiyang2","t":"On the dock","s":"city","e":[{"d":"w","to":"dock9@xiyang2","z":"home"},{"d":"e","to":"dock11@xiyang2","z":"home"},{"d":"n","to":"splank@xiyang2","z":"home"}],"x":78,"y":-26},{"id":"dock11@xiyang2","t":"On the dock","s":"city","e":[{"d":"w","to":"dock10@xiyang2","z":"home"},{"d":"e","to":"dock12@xiyang2","z":"home"}],"x":104,"y":-26},{"id":"dock12@xiyang2","t":"On the dock","s":"city","e":[{"d":"w","to":"dock11@xiyang2","z":"home"},{"d":"e","to":"dock13@xiyang2","z":"home"},{"d":"u","to":"gal_1@xiyang2","z":"home"}],"x":130,"y":-26},{"id":"dock13@xiyang2","t":"On the dock","s":"city","e":[{"d":"w","to":"dock12@xiyang2","z":"home"}],"x":156,"y":-26},{"id":"entrance_chapel@xiyang2","t":"Entrance to the Wedding Chapel","s":"inside","e":[{"d":"n","to":"chapel@xiyang2","z":"home"},{"d":"s","to":"city_rd9@xiyang","z":"home"}],"x":-156,"y":130},{"id":"chapel@xiyang2","t":"Wedding Chapel","s":"inside","e":[{"d":"s","to":"entrance_chapel@xiyang2","z":"home"}],"x":-182,"y":130},{"id":"splank@xiyang2","t":"On the Gang Plank","s":"inside","e":[{"d":"n","to":"sdeck_1@xiyang2","z":"home"},{"d":"s","to":"dock10@xiyang2","z":"home"}],"x":78,"y":-52},{"id":"sdeck_1@xiyang2","t":"On the deck","s":"city","e":[{"d":"s","to":"splank@xiyang2","z":"home"},{"d":"w","to":"fdeck@xiyang2","z":"home"},{"d":"e","to":"adeck@xiyang2","z":"home"},{"d":"d","to":"hull_1@xiyang2","z":"home"}],"x":78,"y":-78},{"id":"fdeck@xiyang2","t":"On the Deck","s":"city","e":[{"d":"e","to":"sdeck_1@xiyang2","z":"home"}],"x":52,"y":-78},{"id":"adeck@xiyang2","t":"On the Deck","s":"city","e":[{"d":"d","to":"hull_1@xiyang2","z":"home"},{"d":"w","to":"sdeck_1@xiyang2","z":"home"}],"x":104,"y":-78},{"id":"hull_1@xiyang2","t":"Inside the ship","s":"city","e":[{"d":"u","to":"sdeck_1@xiyang2","z":"home"},{"d":"e","to":"hull_2@xiyang2","z":"home"},{"d":"w","to":"hull_3@xiyang2","z":"home"}],"x":52,"y":-52},{"id":"hull_2@xiyang2","t":"Inside the ship","s":"city","e":[{"d":"w","to":"hull_1@xiyang2","z":"home"},{"d":"e","to":"hold_room@xiyang2","z":"home"}],"x":104,"y":-52},{"id":"hull_3@xiyang2","t":"Inside the ship","s":"city","e":[{"d":"e","to":"hull_1@xiyang2","z":"home"},{"d":"w","to":"hall_1@xiyang2","z":"home"}],"x":26,"y":-52},{"id":"hall_1@xiyang2","t":"A hall in a ship","s":"city","e":[{"d":"e","to":"hull_3@xiyang2","z":"home"},{"d":"n","to":"hold_room1@xiyang2","z":"home"},{"d":"s","to":"storage_room@xiyang2","z":"home"},{"d":"w","to":"sleep_room@xiyang2","z":"home"}],"x":0,"y":-52},{"id":"sleep_room@xiyang2","t":"The Sleeping quarters","s":"city","e":[{"d":"e","to":"hall_1@xiyang2","z":"home"}],"x":-52,"y":-78},{"id":"storage_room@xiyang2","t":"Storage Room","s":"","e":[{"d":"n","to":"hall_1@xiyang2","z":"home"}],"x":-26,"y":-52},{"id":"hold_room@xiyang2","t":"Dreary Room","s":"city","e":[{"d":"w","to":"hull_2@xiyang2","z":"home"}],"x":78,"y":-104},{"id":"hold_room1@xiyang2","t":"Dreary Room","s":"city","e":[{"d":"s","to":"hull_3@xiyang2","z":"home"}],"x":26,"y":-78},{"id":"gal_1@xiyang2","t":"On The Gang Plank","s":"city","e":[{"d":"d","to":"dock12@xiyang2","z":"home"},{"d":"n","to":"gal_2@xiyang2","z":"home"}],"x":156,"y":-52},{"id":"gal_2@xiyang2","t":"Deck","s":"city","e":[{"d":"s","to":"gal_1@xiyang2","z":"home"},{"d":"n","to":"gal_3@xiyang2","z":"home"},{"d":"w","to":"galley@xiyang2","z":"home"},{"d":"d","to":"hatch@xiyang2","z":"home"},{"d":"e","to":"cap_quarters@xiyang2","z":"home"}],"x":156,"y":-78},{"id":"cap_quarters@xiyang2","t":"Captains Quarters","s":"city","e":[{"d":"w","to":"gal_2@xiyang2","z":"home"}],"x":182,"y":-78},{"id":"gal_3@xiyang2","t":"Deck","s":"city","e":[{"d":"s","to":"gal_2@xiyang2","z":"home"},{"d":"u","to":"climb_pole@xiyang2","z":"home"}],"x":156,"y":-104},{"id":"hatch@xiyang2","t":"In the hatch","s":"city","e":[{"d":"u","to":"gal_2@xiyang2","z":"home"},{"d":"d","to":"ldeck_1@xiyang2","z":"home"}],"x":130,"y":-52},{"id":"ldeck_1@xiyang2","t":"Lower Deck","s":"city","e":[{"d":"u","to":"hatch@xiyang2","z":"home"},{"d":"w","to":"sleep_area1@xiyang2","z":"home"},{"d":"e","to":"live_area@xiyang2","z":"home"}],"x":52,"y":-104},{"id":"sleep_area1@xiyang2","t":"cabin","s":"city","e":[{"d":"e","to":"ldeck_1@xiyang2","z":"home"}],"x":26,"y":-104},{"id":"live_area@xiyang2","t":"Living Area","s":"city","e":[{"d":"w","to":"ldeck_1@xiyang2","z":"home"}],"x":52,"y":-130},{"id":"galley@xiyang2","t":"The Galley","s":"city","e":[{"d":"e","to":"gal_2@xiyang2","z":"home"}],"x":130,"y":-78},{"id":"climb_pole@xiyang2","t":"Climbing The Mast","s":"city","e":[{"d":"d","to":"gal_3@xiyang2","z":"home"},{"d":"u","to":"crows_nest@xiyang2","z":"home"}],"x":130,"y":-130},{"id":"crows_nest@xiyang2","t":"In The Crows Nest","s":"city","e":[{"d":"d","to":"climb_pole@xiyang2","z":"home"}],"x":156,"y":-156},{"id":"tat1@xiyang2","t":"Rainbow Dragon Tattoo","s":"inside","e":[{"d":"s","to":"city_rd37@xiyang","z":"home"}],"x":130,"y":156},{"id":"gate1@xiyang2","t":"The Meridien Gate","s":"city","e":[{"d":"s","to":"city_rd3@xiyang","z":"home"},{"d":"n","to":"palace1@xiyang2","z":"home"}],"x":0,"y":208},{"id":"palace1@xiyang2","t":"Palace Outer Courts","s":"city","e":[{"d":"n","to":"bridge1@xiyang2","z":"home"},{"d":"s","to":"gate1@xiyang2","z":"home"}],"x":26,"y":208},{"id":"bridge1@xiyang2","t":"The Golden River Bridge","s":"city","e":[{"d":"n","to":"palace2@xiyang2","z":"home"},{"d":"s","to":"palace1@xiyang2","z":"home"}],"x":52,"y":182},{"id":"palace2@xiyang2","t":"Palace Outer Courts","s":"city","e":[{"d":"n","to":"gate2@xiyang2","z":"home"},{"d":"s","to":"bridge1@xiyang2","z":"home"}],"x":78,"y":182},{"id":"gate2@xiyang2","t":"Gate of Great Harmony","s":"city","e":[{"d":"s","to":"palace2@xiyang2","z":"home"}],"x":104,"y":182},{"id":"grocer@xiyang2","t":"Xiyang Groceries","s":"city","e":[{"d":"w","to":"city_rd2@xiyang","z":"home"}],"x":26,"y":182},{"id":"pets_old@xiyang2","t":"The Ancient Pet Store","s":"city","e":[{"d":"s","to":"city_rd6@xiyang","z":"home"}],"x":0,"y":104},{"id":"med_room@xiyang2","t":"med_room","s":"city","e":[{"d":"s","to":"city_rd20@xiyang","z":"home"}],"x":0,"y":52},{"id":"stone_cut@xiyang2","t":"Stone Cutters, Inc.","s":"city","e":[{"d":"n","to":"city_rd48@xiyang","z":"home"}],"x":130,"y":104},{"id":"taylor_shop@xiyang2","t":"Taylor's General Store","s":"inside","e":[{"d":"w","to":"taylor_ent@xiyang2","z":"home"}],"x":78,"y":156},{"id":"taylor_ent@xiyang2","t":"The Entrance to Taylor's.","s":"inside","e":[{"d":"e","to":"taylor_shop@xiyang2","z":"home"},{"d":"s","to":"city_rd36@xiyang","z":"home"}],"x":52,"y":156},{"id":"comms_shop1@xiyang2","t":"Nof's Place","s":"inside","e":[{"d":"s","to":"city_rd45@xiyang","z":"home"},{"d":"n","to":"comms_shop2@xiyang2","z":"home","door":true}],"x":26,"y":52},{"id":"comms_shop2@xiyang2","t":"Nof's workplace","s":"inside","e":[{"d":"s","to":"comms_shop1@xiyang2","z":"home"}],"x":26,"y":0},{"id":"slaver_1@xiyang2","t":"the Slaver","s":"","e":[],"x":260,"y":0},{"id":"slave_1@xiyang2","t":"a Slave","s":"","e":[],"x":338,"y":0},{"id":"sailor_1@xiyang2","t":"the Sailor","s":"","e":[],"x":416,"y":0},{"id":"sailor_2@xiyang2","t":"a Mean Pirate","s":"","e":[],"x":494,"y":0},{"id":"sailor_3@xiyang2","t":"Captain Leary","s":"","e":[],"x":572,"y":0},{"id":"sailor_4@xiyang2","t":"a Mean Sailor","s":"","e":[],"x":650,"y":0},{"id":"parrot@xiyang2","t":"a Parrot","s":"","e":[],"x":728,"y":0},{"id":"lunis@xiyang2","t":"Lunis","s":"","e":[],"x":806,"y":0},{"id":"pet_keeper@xiyang2","t":"Tilis","s":"","e":[],"x":884,"y":0},{"id":"irezumi@xiyang2","t":"Irezumi","s":"","e":[],"x":962,"y":0},{"id":"george@xiyang2","t":"George","s":"","e":[],"x":1040,"y":0},{"id":"father_andrew@xiyang2","t":"Father Andrew","s":"","e":[],"x":1118,"y":0},{"id":"mayor@xiyang2","t":"Mayor Shino","s":"","e":[],"x":1196,"y":0},{"id":"valley_1@oxiyang","t":"Valley of the Cherry Blossoms","s":"hills","e":[{"d":"n","to":"valley_2@oxiyang","z":"home"}],"x":-52,"y":598},{"id":"valley_2@oxiyang","t":"Valley of the Cherry Blossoms","s":"hills","e":[{"d":"n","to":"path_1@oxiyang","z":"home"},{"d":"s","to":"valley_1@oxiyang","z":"home"}],"x":-52,"y":572},{"id":"path_1@oxiyang","t":"The Path leading into Valley","s":"field","e":[{"d":"n","to":"path_2@oxiyang","z":"home"},{"d":"s","to":"valley_2@oxiyang","z":"home"}],"x":-52,"y":546},{"id":"path_2@oxiyang","t":"The narrow bend","s":"field","e":[{"d":"e","to":"path_3@oxiyang","z":"home"},{"d":"s","to":"path_1@oxiyang","z":"home"}],"x":-52,"y":520},{"id":"path_3@oxiyang","t":"At a narrow bend","s":"field","e":[{"d":"n","to":"path_4@oxiyang","z":"home"},{"d":"w","to":"path_2@oxiyang","z":"home"}],"x":-26,"y":520},{"id":"path_4@oxiyang","t":"End of path","s":"field","e":[{"d":"n","to":"south_bank@oxiyang","z":"home"},{"d":"w","to":"river_shop@oxiyang","z":"home"},{"d":"s","to":"path_3@oxiyang","z":"home"}],"x":-26,"y":494},{"id":"river_shop@oxiyang","t":"Boat shop beside the yellow river","s":"inside","e":[{"d":"e","to":"path_4@oxiyang","z":"home"}],"x":-52,"y":494},{"id":"south_bank@oxiyang","t":"South Bank","s":"field","e":[{"d":"n","to":"river_1@oxiyang","z":"home"},{"d":"s","to":"path_4@oxiyang","z":"home"}],"x":-26,"y":468},{"id":"river_1@oxiyang","t":"On the Yellow River","s":"water_sail","e":[{"d":"n","to":"north_bank@oxiyang","z":"home"},{"d":"e","to":"river_2@oxiyang","z":"home"},{"d":"w","to":"lake_1@oxiyang","z":"home"},{"d":"s","to":"south_bank@oxiyang","z":"home"}],"x":-26,"y":442},{"id":"river_2@oxiyang","t":"Yellow River","s":"water_sail","e":[{"d":"w","to":"river_1@oxiyang","z":"home"},{"d":"e","to":"river_3@oxiyang","z":"home"}],"x":0,"y":442},{"id":"river_3@oxiyang","t":"End of river","s":"water_sail","e":[{"d":"w","to":"river_2@oxiyang","z":"home"},{"d":"e","to":"ent_und@neptune","z":"neptune"}],"x":26,"y":442},{"id":"lake_1@oxiyang","t":"Small Lake near the Waterfall","s":"water_sail","e":[{"d":"e","to":"river_1@oxiyang","z":"home"},{"d":"w","to":"waterfall@oxiyang","z":"home"}],"x":-52,"y":442},{"id":"waterfall@oxiyang","t":"Waterfall","s":"water_sail","e":[{"d":"e","to":"lake_1@oxiyang","z":"home"},{"d":"w","to":"behind_waterf@oxiyang","z":"home"}],"x":-78,"y":442},{"id":"behind_waterf@oxiyang","t":"Behind the Waterfall","s":"forest","e":[{"d":"s","to":"beach_1@oxiyang","z":"home"},{"d":"e","to":"waterfall@oxiyang","z":"home"}],"x":-104,"y":442},{"id":"beach_1@oxiyang","t":"On the beach","s":"desert","e":[{"d":"w","to":"path_5@oxiyang","z":"home"},{"d":"n","to":"behind_waterf@oxiyang","z":"home"}],"x":-104,"y":468},{"id":"path_5@oxiyang","t":"Dark Underground Cave","s":"inside","e":[{"d":"e","to":"beach_1@oxiyang","z":"home"},{"d":"n","to":"path_6@oxiyang","z":"home"}],"x":-130,"y":468},{"id":"path_6@oxiyang","t":"A Narrow Underground Tunnel","s":"inside","e":[{"d":"s","to":"path_5@oxiyang","z":"home"},{"d":"w","to":"junction_1@oxiyang","z":"home"}],"x":-130,"y":442},{"id":"junction_1@oxiyang","t":"A Junction at the foot of Two Mountains","s":"hills","e":[{"d":"n","to":"shaolin_mount_1@oxiyang","z":"home"},{"d":"e","to":"path_6@oxiyang","z":"home"},{"d":"w","to":"out_wine_shop@oxiyang","z":"home"},{"d":"s","to":"huashan_mount_1@oxiyang","z":"home"}],"x":-156,"y":442},{"id":"shaolin_mount_1@oxiyang","t":"Shaolin Mountains","s":"hills","e":[{"d":"s","to":"junction_1@oxiyang","z":"home"},{"d":"n","to":"rentry@demon_realm","z":"demon_realm"}],"x":-156,"y":416},{"id":"huashan_mount_1@oxiyang","t":"Huashan Mountains","s":"","e":[{"d":"n","to":"junction_1@oxiyang","z":"home"},{"d":"d","to":"entrance@oxiyang","z":"home","door":true}],"x":-156,"y":468},{"id":"out_wine_shop@oxiyang","t":"Outside the Wine Shop","s":"field","e":[{"d":"e","to":"junction_1@oxiyang","z":"home"},{"d":"d","to":"cave1@oxiyang","z":"home"}],"x":-182,"y":442},{"id":"north_bank@oxiyang","t":"North Bank","s":"hills","e":[{"d":"n","to":"imperial_rd1@oxiyang","z":"home"},{"d":"s","to":"river_1@oxiyang","z":"home"}],"x":-26,"y":416},{"id":"imperial_rd1@oxiyang","t":"The Start of the Imperial Road","s":"city","e":[{"d":"n","to":"imperial_rd2@oxiyang","z":"home"},{"d":"e","to":"imperial_gp1@oxiyang","z":"home"},{"d":"w","to":"imperial_gp2@oxiyang","z":"home"},{"d":"s","to":"north_bank@oxiyang","z":"home"}],"x":-26,"y":390},{"id":"imperial_rd2@oxiyang","t":"The Imperial Road","s":"city","e":[{"d":"n","to":"imperial_rd3@oxiyang","z":"home"}],"x":-26,"y":364},{"id":"imperial_rd3@oxiyang","t":"The Imperial Road Junction","s":"city","e":[{"d":"n","to":"imperial_rd4@oxiyang","z":"home"},{"d":"e","to":"imperial_rd6@oxiyang","z":"home"},{"d":"w","to":"imperial_rd10@oxiyang","z":"home"},{"d":"s","to":"imperial_rd2@oxiyang","z":"home"}],"x":-26,"y":338},{"id":"imperial_rd4@oxiyang","t":"The Imperial Road","s":"city","e":[{"d":"n","to":"imperial_rd5@oxiyang","z":"home"},{"d":"s","to":"imperial_rd3@oxiyang","z":"home"}],"x":-26,"y":312},{"id":"imperial_rd5@oxiyang","t":"The Imperial Road","s":"city","e":[{"d":"n","to":"causeway_1@oxiyang","z":"home"},{"d":"e","to":"imperial_gp3@oxiyang","z":"home"},{"d":"w","to":"imperial_gp4@oxiyang","z":"home"},{"d":"s","to":"imperial_rd4@oxiyang","z":"home"}],"x":-26,"y":286},{"id":"imperial_rd6@oxiyang","t":"The Imperial Road","s":"city","e":[{"d":"n","to":"gdorm1@oxiyang","z":"home"},{"d":"w","to":"imperial_rd3@oxiyang","z":"home"},{"d":"e","to":"imperial_rd7@oxiyang","z":"home"}],"x":0,"y":338},{"id":"imperial_rd7@oxiyang","t":"The Imperial Road","s":"city","e":[{"d":"n","to":"imperial_gp5@oxiyang","z":"home"},{"d":"e","to":"path_7@oxiyang","z":"home"},{"d":"s","to":"imperial_gp6@oxiyang","z":"home"},{"d":"w","to":"imperial_rd6@oxiyang","z":"home"}],"x":26,"y":338},{"id":"path_7@oxiyang","t":"A path leading to the Desert of Gaumbi","s":"field","e":[{"d":"n","to":"desert_1@oxiyang","z":"home"},{"d":"w","to":"imperial_rd7@oxiyang","z":"home"}],"x":52,"y":338},{"id":"desert_1@oxiyang","t":"In the Desert","s":"desert","e":[{"d":"n","to":"desert_2@oxiyang","z":"home"},{"d":"s","to":"path_7@oxiyang","z":"home"}],"x":52,"y":312},{"id":"desert_2@oxiyang","t":"In the Desert","s":"desert","e":[{"d":"w","to":"desert_3@oxiyang","z":"home"},{"d":"n","to":"desert_5@oxiyang","z":"home"},{"d":"e","to":"oasis_1@oxiyang","z":"home"},{"d":"s","to":"desert_1@oxiyang","z":"home"}],"x":52,"y":286},{"id":"desert_3@oxiyang","t":"In the Desert","s":"desert","e":[{"d":"w","to":"desert_2@oxiyang","z":"home"},{"d":"n","to":"desert_4@oxiyang","z":"home"},{"d":"e","to":"desert_2@oxiyang","z":"home"}],"x":26,"y":286},{"id":"desert_4@oxiyang","t":"desert_4","s":"desert","e":[{"d":"e","to":"desert_5@oxiyang","z":"home"},{"d":"s","to":"desert_3@oxiyang","z":"home"}],"x":78,"y":208},{"id":"desert_5@oxiyang","t":"In the Desert","s":"desert","e":[{"d":"w","to":"desert_4@oxiyang","z":"home"},{"d":"e","to":"desert_6@oxiyang","z":"home"},{"d":"s","to":"desert_2@oxiyang","z":"home"}],"x":52,"y":260},{"id":"desert_6@oxiyang","t":"In the Desert","s":"desert","e":[{"d":"w","to":"desert_5@oxiyang","z":"home"},{"d":"e","to":"desert_7@oxiyang","z":"home"},{"d":"s","to":"oasis_1@oxiyang","z":"home"}],"x":78,"y":260},{"id":"desert_7@oxiyang","t":"In the Desert","s":"desert","e":[{"d":"w","to":"desert_6@oxiyang","z":"home"},{"d":"n","to":"desert_8@oxiyang","z":"home"}],"x":104,"y":260},{"id":"desert_8@oxiyang","t":"In the Desert","s":"desert","e":[{"d":"w","to":"oasis_1@oxiyang","z":"home"},{"d":"n","to":"desert_7@oxiyang","z":"home"},{"d":"s","to":"desert_9@oxiyang","z":"home"}],"x":104,"y":286},{"id":"desert_9@oxiyang","t":"In the Desert","s":"desert","e":[{"d":"w","to":"desert_10@oxiyang","z":"home"},{"d":"n","to":"desert_8@oxiyang","z":"home"},{"d":"e","to":"desert_10@oxiyang","z":"home"},{"d":"s","to":"des_2E@desert","z":"desert"}],"x":104,"y":312},{"id":"desert_10@oxiyang","t":"In the Desert","s":"desert","e":[{"d":"w","to":"desert_9@oxiyang","z":"home"},{"d":"n","to":"oasis_1@oxiyang","z":"home"},{"d":"e","to":"desert_9@oxiyang","z":"home"}],"x":78,"y":312},{"id":"oasis_1@oxiyang","t":"An Oasis in the Desert","s":"desert","e":[{"d":"n","to":"desert_6@oxiyang","z":"home"},{"d":"s","to":"desert_10@oxiyang","z":"home"},{"d":"e","to":"desert_8@oxiyang","z":"home"},{"d":"w","to":"desert_2@oxiyang","z":"home"}],"x":78,"y":286},{"id":"imperial_rd10@oxiyang","t":"The Imperial Road","s":"city","e":[{"d":"n","to":"garea1@oxiyang","z":"home"},{"d":"e","to":"imperial_rd3@oxiyang","z":"home"},{"d":"w","to":"imperial_rd11@oxiyang","z":"home"}],"x":-52,"y":338},{"id":"imperial_rd11@oxiyang","t":"The Imperial Road","s":"city","e":[{"d":"n","to":"imperial_gp7@oxiyang","z":"home"},{"d":"w","to":"path_8@oxiyang","z":"home"},{"d":"s","to":"imperial_gp8@oxiyang","z":"home"},{"d":"e","to":"imperial_rd10@oxiyang","z":"home"}],"x":-78,"y":338},{"id":"path_8@oxiyang","t":"A Path","s":"city","e":[{"d":"e","to":"imperial_rd11@oxiyang","z":"home"},{"d":"w","to":"plains_1@oxiyang","z":"home"}],"x":-104,"y":338},{"id":"plains_1@oxiyang","t":"Plains of Jihar","s":"field","e":[{"d":"e","to":"path_8@oxiyang","z":"home"},{"d":"n","to":"plains_2@oxiyang","z":"home"},{"d":"s","to":"plains_3@oxiyang","z":"home"},{"d":"w","to":"plains_4@oxiyang","z":"home"}],"x":-130,"y":338},{"id":"plains_2@oxiyang","t":"Plains of Jihar","s":"field","e":[{"d":"s","to":"plains_1@oxiyang","z":"home"},{"d":"n","to":"plains_1@oxiyang","z":"home"},{"d":"w","to":"plains_5@oxiyang","z":"home"},{"d":"e","to":"plains_7@oxiyang","z":"home"}],"x":-130,"y":312},{"id":"plains_3@oxiyang","t":"Plains of Jihar","s":"field","e":[{"d":"s","to":"plains_1@oxiyang","z":"home"},{"d":"n","to":"plains_1@oxiyang","z":"home"},{"d":"e","to":"plains_8@oxiyang","z":"home"},{"d":"w","to":"plains_6@oxiyang","z":"home"}],"x":-130,"y":364},{"id":"plains_4@oxiyang","t":"Plains of Jihar","s":"field","e":[{"d":"n","to":"plains_5@oxiyang","z":"home"},{"d":"s","to":"plains_6@oxiyang","z":"home"},{"d":"w","to":"plains_6@oxiyang","z":"home"},{"d":"e","to":"plains_1@oxiyang","z":"home"}],"x":-156,"y":338},{"id":"plains_5@oxiyang","t":"Plains of Jihar","s":"field","e":[{"d":"e","to":"plains_2@oxiyang","z":"home"},{"d":"n","to":"plains_4@oxiyang","z":"home"},{"d":"s","to":"plains_4@oxiyang","z":"home"},{"d":"w","to":"plains_2@oxiyang","z":"home"}],"x":-156,"y":312},{"id":"plains_6@oxiyang","t":"Plains of Jihar","s":"field","e":[{"d":"e","to":"plains_3@oxiyang","z":"home"},{"d":"n","to":"plains_4@oxiyang","z":"home"},{"d":"s","to":"plains_5@oxiyang","z":"home"},{"d":"w","to":"plains_8@oxiyang","z":"home"}],"x":-156,"y":364},{"id":"plains_7@oxiyang","t":"Plains of Jihar","s":"field","e":[{"d":"e","to":"plains_5@oxiyang","z":"home"},{"d":"n","to":"plains_8@oxiyang","z":"home"},{"d":"s","to":"plains_8@oxiyang","z":"home"},{"d":"w","to":"plains_5@oxiyang","z":"home"}],"x":-104,"y":312},{"id":"plains_8@oxiyang","t":"Plains of Jihar","s":"field","e":[{"d":"e","to":"plains_6@oxiyang","z":"home"},{"d":"n","to":"plains_7@oxiyang","z":"home"},{"d":"s","to":"plains_7@oxiyang","z":"home"},{"d":"w","to":"plains_6@oxiyang","z":"home"}],"x":-104,"y":364},{"id":"causeway_1@oxiyang","t":"The Imperial Causeway","s":"city","e":[{"d":"n","to":"causeway_2@oxiyang","z":"home"},{"d":"s","to":"imperial_rd5@oxiyang","z":"home"}],"x":-26,"y":260},{"id":"causeway_2@oxiyang","t":"The Imperial Causeway","s":"city","e":[{"d":"n","to":"causeway_3@oxiyang","z":"home"},{"d":"s","to":"causeway_1@oxiyang","z":"home"}],"x":-26,"y":234},{"id":"causeway_3@oxiyang","t":"The Imperial Causeway","s":"city","e":[{"d":"n","to":"city_rd1@xiyang","z":"home"},{"d":"s","to":"causeway_2@oxiyang","z":"home"}],"x":-26,"y":208},{"id":"imperial_gp1@oxiyang","t":"Imperial Guard Post","s":"inside","e":[{"d":"w","to":"imperial_rd1@oxiyang","z":"home"}],"x":0,"y":390},{"id":"imperial_gp2@oxiyang","t":"Imperial Guard Post","s":"inside","e":[{"d":"e","to":"imperial_rd1@oxiyang","z":"home"}],"x":-52,"y":390},{"id":"imperial_gp3@oxiyang","t":"Imperial Guard Post","s":"inside","e":[{"d":"w","to":"imperial_rd5@oxiyang","z":"home"}],"x":0,"y":286},{"id":"imperial_gp4@oxiyang","t":"Imperial Guard Post","s":"inside","e":[{"d":"e","to":"imperial_rd5@oxiyang","z":"home"}],"x":-52,"y":286},{"id":"imperial_gp5@oxiyang","t":"Imperial Guard Post","s":"inside","e":[{"d":"s","to":"imperial_rd7@oxiyang","z":"home"}],"x":26,"y":312},{"id":"imperial_gp6@oxiyang","t":"Imperial Guard Post","s":"inside","e":[{"d":"n","to":"imperial_rd7@oxiyang","z":"home"}],"x":26,"y":364},{"id":"imperial_gp7@oxiyang","t":"Imperial Guard Post","s":"inside","e":[{"d":"s","to":"imperial_rd11@oxiyang","z":"home"}],"x":-78,"y":312},{"id":"imperial_gp8@oxiyang","t":"Imperial Guard Post","s":"inside","e":[{"d":"n","to":"imperial_rd11@oxiyang","z":"home"}],"x":-78,"y":364},{"id":"gdorm1@oxiyang","t":"At the entrance of the Guards' Barracks","s":"field","e":[{"d":"n","to":"gdorm2@oxiyang","z":"home"},{"d":"s","to":"imperial_rd6@oxiyang","z":"home"}],"x":0,"y":312},{"id":"gdorm2@oxiyang","t":"The Courtyard in the Guard's Barracks","s":"field","e":[{"d":"n","to":"gdorm3@oxiyang","z":"home"},{"d":"s","to":"gdorm1@oxiyang","z":"home"}],"x":0,"y":260},{"id":"gdorm3@oxiyang","t":"The Courtyard in the Guard's Barracks","s":"field","e":[{"d":"n","to":"gdorm4@oxiyang","z":"home"},{"d":"s","to":"gdorm2@oxiyang","z":"home"},{"d":"e","to":"gdorm5@oxiyang","z":"home"},{"d":"w","to":"gdorm7@oxiyang","z":"home"}],"x":26,"y":234},{"id":"gdorm4@oxiyang","t":"The Captains Office","s":"inside","e":[{"d":"s","to":"gdorm3@oxiyang","z":"home"}],"x":52,"y":208},{"id":"gdorm5@oxiyang","t":"The Guard's Barracks","s":"inside","e":[{"d":"w","to":"gdorm3@oxiyang","z":"home"}],"x":52,"y":234},{"id":"gdorm7@oxiyang","t":"The Guard's Barracks","s":"inside","e":[{"d":"e","to":"gdorm3@oxiyang","z":"home"}],"x":26,"y":260},{"id":"garea1@oxiyang","t":"At the entrance leading to the Guard's Area","s":"field","e":[{"d":"n","to":"garea2@oxiyang","z":"home"},{"d":"s","to":"imperial_rd10@oxiyang","z":"home"}],"x":-52,"y":312},{"id":"garea2@oxiyang","t":"The courtyard in the Guard's area","s":"field","e":[{"d":"n","to":"garea3@oxiyang","z":"home"},{"d":"e","to":"garea4@oxiyang","z":"home"},{"d":"w","to":"garea5@oxiyang","z":"home"},{"d":"s","to":"garea1@oxiyang","z":"home"}],"x":-78,"y":260},{"id":"garea3@oxiyang","t":"The Guard's Rest House","s":"inside","e":[{"d":"s","to":"garea2@oxiyang","z":"home"}],"x":-78,"y":234},{"id":"garea4@oxiyang","t":"The Guard's armory","s":"inside","e":[{"d":"w","to":"garea2@oxiyang","z":"home"}],"x":-52,"y":260},{"id":"garea5@oxiyang","t":"The Practice Dojo","s":"inside","e":[{"d":"e","to":"garea2@oxiyang","z":"home"}],"x":-104,"y":260},{"id":"cave1@oxiyang","t":"Cave of Night","s":"inside","e":[{"d":"n","to":"cave2@oxiyang","z":"home"},{"d":"u","to":"out_wine_shop@oxiyang","z":"home"}],"x":-208,"y":468},{"id":"cave2@oxiyang","t":"Cave of Night","s":"inside","e":[{"d":"n","to":"cave3@oxiyang","z":"home"},{"d":"s","to":"cave1@oxiyang","z":"home"}],"x":-208,"y":442},{"id":"cave3@oxiyang","t":"Cave of Night","s":"inside","e":[{"d":"n","to":"cave4@oxiyang","z":"home"},{"d":"s","to":"cave2@oxiyang","z":"home"}],"x":-234,"y":390},{"id":"cave4@oxiyang","t":"Cave of Night","s":"inside","e":[{"d":"s","to":"cave3@oxiyang","z":"home"}],"x":-234,"y":364},{"id":"entrance@oxiyang","t":"Entrance to Huashan Temple","s":"field","e":[{"d":"n","to":"hall_south@oxiyang","z":"home"},{"d":"u","to":"huashan_mount_1@oxiyang","z":"home"}],"x":-182,"y":468},{"id":"hall_south@oxiyang","t":"The South Hall of Huashan Temple","s":"inside","e":[{"d":"n","to":"hall_center@oxiyang","z":"home"},{"d":"w","to":"closet@oxiyang","z":"home"},{"d":"e","to":"guards_room@oxiyang","z":"home"},{"d":"s","to":"entrance@oxiyang","z":"home"}],"x":-208,"y":416},{"id":"closet@oxiyang","t":"A Closet","s":"inside","e":[{"d":"e","to":"hall_south@oxiyang","z":"home"},{"d":"w","to":"secret_room@oxiyang","z":"home","door":true}],"x":-234,"y":416},{"id":"secret_room@oxiyang","t":"A Secret Room","s":"inside","e":[{"d":"e","to":"closet@oxiyang","z":"home"},{"d":"d","to":"basement@oxiyang","z":"home"}],"x":-260,"y":416},{"id":"basement@oxiyang","t":"The Basement","s":"desert","e":[{"d":"u","to":"secret_room@oxiyang","z":"home"},{"d":"n","to":"balrogs_nest@oxiyang","z":"home"}],"x":-286,"y":390},{"id":"balrogs_nest@oxiyang","t":"The Balrogs Nest","s":"desert","e":[{"d":"s","to":"basement@oxiyang","z":"home"}],"x":-286,"y":364},{"id":"guards_room@oxiyang","t":"The Guards Room","s":"inside","e":[{"d":"w","to":"hall_south@oxiyang","z":"home"}],"x":-182,"y":416},{"id":"hall_center@oxiyang","t":"The Center of Huashan Temple","s":"inside","e":[{"d":"n","to":"hall_north@oxiyang","z":"home"},{"d":"s","to":"hall_south@oxiyang","z":"home"},{"d":"w","to":"hall_west@oxiyang","z":"home"},{"d":"e","to":"hall_east@oxiyang","z":"home"}],"x":-208,"y":390},{"id":"hall_east@oxiyang","t":"The east hall of Huashan Temple","s":"inside","e":[{"d":"w","to":"hall_center@oxiyang","z":"home"}],"x":-182,"y":390},{"id":"hall_west@oxiyang","t":"The west hall of Huashan Temple","s":"inside","e":[{"d":"e","to":"hall_center@oxiyang","z":"home"}],"x":-260,"y":364},{"id":"hall_north@oxiyang","t":"The north hall of Huashan Temple","s":"inside","e":[{"d":"s","to":"hall_center@oxiyang","z":"home"},{"d":"e","to":"training_room_s@oxiyang","z":"home"},{"d":"w","to":"fighting_room_s@oxiyang","z":"home"}],"x":-208,"y":364},{"id":"fighting_room_s@oxiyang","t":"Huashan Sword Fighting Room","s":"inside","e":[{"d":"n","to":"fighting_room_n@oxiyang","z":"home"},{"d":"e","to":"hall_north@oxiyang","z":"home"}],"x":-260,"y":338},{"id":"fighting_room_n@oxiyang","t":"Huashan Sword Fighting Room","s":"inside","e":[{"d":"u","to":"masters_room@oxiyang","z":"home"},{"d":"s","to":"fighting_room_s@oxiyang","z":"home"}],"x":-260,"y":312},{"id":"masters_room@oxiyang","t":"The Masters Room","s":"inside","e":[{"d":"d","to":"fighting_room_n@oxiyang","z":"home"}],"x":-286,"y":286},{"id":"training_room_s@oxiyang","t":"Huashan Sword Training Room","s":"inside","e":[{"d":"n","to":"training_room_n@oxiyang","z":"home"},{"d":"w","to":"hall_north@oxiyang","z":"home"}],"x":-182,"y":364},{"id":"training_room_n@oxiyang","t":"Huashan Sword Training Room","s":"inside","e":[{"d":"s","to":"training_room_s@oxiyang","z":"home"}],"x":-182,"y":338}];
+const NS = "http://www.w3.org/2000/svg";
+const DV = { n: [0, -1], s: [0, 1], e: [1, 0], w: [-1, 0], u: [0.7, -0.7], d: [-0.7, 0.7] };
+const DNAME = { n: "north", s: "south", e: "east", w: "west", u: "up", d: "down" };
+const byId = new Map(ROOMS.map(r => [r.id, r]));
+// Screen sizes in px, the same at every zoom
+const DOT = 5, LBL = 12, AWAY = 10.5, MAXZ = 14;
+
+// Place rooms without coordinates next to a placed neighbour, in the exit's direction
+let pending = ROOMS.filter(r => r.x == null);
+for (let pass = 0; pass < 20 && pending.length; pass++) {
+  for (const r of pending) {
+    for (const e of r.e) {
+      const t = e.z === "home" && byId.get(e.to);
+      if (t && t.x != null) { const v = DV[e.d]; r.x = t.x - v[0] * 26; r.y = t.y - v[1] * 26; r.placed = true; break; }
+    }
+    if (r.x == null) for (const o of ROOMS) {
+      if (o.x == null) continue;
+      const back = o.e.find(e => e.z === "home" && e.to === r.id);
+      if (back) { const v = DV[back.d]; r.x = o.x + v[0] * 26; r.y = o.y + v[1] * 26; r.placed = true; break; }
+    }
+  }
+  pending = pending.filter(r => r.x == null);
+}
+// Rooms drawn on (nearly) the same spot, e.g. floors of one tower: fan them out a little
+{
+  const done = new Set();
+  for (const r of ROOMS) {
+    if (done.has(r)) continue;
+    const grp = ROOMS.filter(o => !done.has(o) && Math.hypot(o.x - r.x, o.y - r.y) < 6);
+    grp.forEach(o => done.add(o));
+    if (grp.length < 2) continue;
+    const cx = grp.reduce((a, o) => a + o.x, 0) / grp.length, cy = grp.reduce((a, o) => a + o.y, 0) / grp.length;
+    const rad = 4 + grp.length * 1.5;
+    grp.forEach((o, i) => { const a = -Math.PI / 2 + i * 2 * Math.PI / grp.length; o.x = cx + rad * Math.cos(a); o.y = cy + rad * Math.sin(a); });
+  }
+}
+
+const edgesG = document.getElementById("edges"), nodesG = document.getElementById("nodes");
+const el = (n, a, p) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); p && p.appendChild(e); return e; };
+
+// One line per pair of rooms; doors get a tick across the line
+const pairs = new Map();
+let nAway = 0, nExits = 0;
+for (const r of ROOMS) for (const e of r.e) {
+  nExits++;
+  if (e.z !== "home") { nAway++; continue; }
+  const k = [r.id, e.to].sort().join("|");
+  const p = pairs.get(k) || { a: r.id, b: e.to, vert: false, door: false };
+  p.vert = p.vert || e.d === "u" || e.d === "d"; p.door = p.door || !!e.door;
+  pairs.set(k, p);
+}
+const segs = []; // lines in map units, so labels can avoid sitting on them
+const ticks = []; // {el, x, y, nx, ny}: centre and unit normal, length set per zoom
+function addTick(x, y, nx, ny) { ticks.push({ el: el("line", { class: "doorTick" }, edgesG), x, y, nx, ny }); }
+for (const p of pairs.values()) {
+  const a = byId.get(p.a), b = byId.get(p.b);
+  el("line", { x1: a.x, y1: a.y, x2: b.x, y2: b.y, class: "edge" + (p.vert ? " vert" : "") }, edgesG);
+  segs.push([a.x, a.y, b.x, b.y]);
+  if (p.door) { const L = Math.hypot(b.x - a.x, b.y - a.y) || 1; addTick((a.x + b.x) / 2, (a.y + b.y) / 2, -(b.y - a.y) / L, (b.x - a.x) / L); }
+}
+
+// Labels: every room's name, and the zone names at the ends of exits out of the city.
+// Each has a size in screen px; place() decides per zoom which fit and where.
+const labels = [];
+const stubs = [];
+for (const r of ROOMS) for (const e of r.e) if (e.z !== "home") {
+  const v = DV[e.d];
+  stubs.push({ r, v, el: el("line", { class: "edge away" }, edgesG) });
+  if (e.door) addTick(r.x + v[0] * 11, r.y + v[1] * 11, -v[1], v[0]);
+  const t = el("text", { class: "awayLbl" }, edgesG);
+  t.textContent = "→ " + e.z;
+  labels.push({ el: t, away: true, r, v, size: AWAY, prio: 2 });
+}
+const gById = new Map(), dots = [], marks = [];
+const titleCount = new Map();
+ROOMS.forEach(r => titleCount.set(r.t, (titleCount.get(r.t) || 0) + 1));
+for (const r of ROOMS) {
+  const g = el("g", { class: "g-room", tabindex: "0", role: "button", "aria-label": r.t }, nodesG);
+  el("title", {}, g).textContent = r.t;
+  const sect = ["city", "inside", "field", "hills", "water_swim"].includes(r.s) ? r.s : "other";
+  dots.push({ r, el: el("circle", { cx: r.x, cy: r.y, class: "node " + sect }, g) });
+  const t = el("text", { class: "lbl" }, g);
+  t.textContent = r.t;
+  // Unique names first (a sixteenth "Wall Road" tells less than a shop's name)
+  labels.push({ el: t, r, size: LBL, prio: titleCount.get(r.t) > 1 ? 0 : 1 });
+  const up = r.e.some(e => e.d === "u"), down = r.e.some(e => e.d === "d");
+  if (up || down) { const m = el("text", { class: "vmark" }, g); m.textContent = (up ? "▲" : "") + (down ? "▼" : ""); marks.push({ r, el: m }); }
+  g.addEventListener("click", ev => { ev.stopPropagation(); select(r.id, false); });
+  g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select(r.id, false); } });
+  gById.set(r.id, g);
+}
+document.getElementById("meta").textContent = `${ROOMS.length} rooms · ${nExits} exits · ${nAway} lead out of the city`;
+
+// Measure each label once at its screen size (the map's scale is 1 here)
+function measure() {
+  for (const m of marks) { m.el.classList.remove("off"); m.el.setAttribute("font-size", 9); m.el.setAttribute("x", 0); m.el.setAttribute("y", 0); const b = m.el.getBBox(); m.w = b.width; m.h = b.height; m.asc = -b.y; }
+  for (const L of labels) {
+    L.el.classList.remove("off");
+    L.el.setAttribute("font-size", L.size); L.el.setAttribute("x", 0); L.el.setAttribute("y", 0);
+    const b = L.el.getBBox(); L.w = b.width + 2; L.h = b.height; L.asc = -b.y;
+  }
+}
+measure();
+
+const svg = document.getElementById("svg"), vp = document.getElementById("vp"), wrap = document.getElementById("wrap");
+let view = { s: 1, x: 0, y: 0 };
+let selected = null, matches = new Set();
+
+// Sizes that stay the same on screen, and which labels fit where, for the current zoom
+function place() {
+  const s = view.s, k = 1 / s;
+  for (const d of dots) d.el.setAttribute("r", DOT * k);
+  for (const t of ticks) t.el.setAttribute("x1", t.x - t.nx * 5 * k), t.el.setAttribute("y1", t.y - t.ny * 5 * k), t.el.setAttribute("x2", t.x + t.nx * 5 * k), t.el.setAttribute("y2", t.y + t.ny * 5 * k);
+  const stubLen = Math.max(14, 30 * k); // map units: at least 30 px on screen
+  for (const st of stubs) { st.x2 = st.r.x + st.v[0] * stubLen; st.y2 = st.r.y + st.v[1] * stubLen; st.el.setAttribute("x1", st.r.x); st.el.setAttribute("y1", st.r.y); st.el.setAttribute("x2", st.x2); st.el.setAttribute("y2", st.y2); }
+
+  // Greedy placement in screen px over a grid of buckets; dots are obstacles too
+  const B = 64, grid = new Map();
+  const key = (i, j) => i * 100003 + j;
+  const add = bx => { for (let i = Math.floor(bx[0] / B); i <= Math.floor(bx[2] / B); i++) for (let j = Math.floor(bx[1] / B); j <= Math.floor(bx[3] / B); j++) { const kk = key(i, j); (grid.get(kk) || grid.set(kk, []).get(kk)).push(bx); } };
+  const free = (bx, own) => { for (let i = Math.floor(bx[0] / B); i <= Math.floor(bx[2] / B); i++) for (let j = Math.floor(bx[1] / B); j <= Math.floor(bx[3] / B); j++) for (const o of grid.get(key(i, j)) || []) if (o !== own && bx[0] < o[2] && o[0] < bx[2] && bx[1] < o[3] && o[1] < bx[3]) return false; return true; };
+  // The visible frame in the same px space, less the zoom buttons: a label that
+  // would be cut off at its edge tries another side first
+  const W = wrap.clientWidth, H = wrap.clientHeight, vx = -view.x, vy = -view.y;
+  const clipped = bx => bx[0] < vx + 2 || bx[1] < vy + 2 || bx[2] > vx + W - 2 || bx[3] > vy + H - 2 ||
+    (bx[2] > vx + W - 56 && bx[3] > vy + H - 100);
+  const dotBox = new Map();
+  for (const d of dots) { const x = d.r.x * s, y = d.r.y * s, bx = [x - DOT - 1, y - DOT - 1, x + DOT + 1, y + DOT + 1]; dotBox.set(d.r, bx); add(bx); }
+  // Up/down marks beside their dot, or left out where another room's dot or mark is
+  for (const m of marks) {
+    const x = m.r.x * s, y = m.r.y * s;
+    const cand = [[x + DOT + 1, y - DOT - m.h + 2], [x - DOT - 1 - m.w, y - DOT - m.h + 2], [x + DOT + 1, y + DOT - 2]];
+    let ok = null;
+    for (const [lx, ly] of cand) { const bx = [lx, ly, lx + m.w, ly + m.h]; if (free(bx, dotBox.get(m.r)) && !clipped(bx)) { ok = bx; break; } }
+    m.el.classList.toggle("off", !ok);
+    if (!ok) continue;
+    add(ok);
+    m.el.setAttribute("font-size", 9 * k); m.el.setAttribute("x", ok[0] * k); m.el.setAttribute("y", (ok[1] + m.asc) * k);
+  }
+  // How many lines cross a box (screen px): labels prefer a spot no line crosses
+  const S = segs.concat(stubs.map(st => [st.r.x, st.r.y, st.x2, st.y2])).map(g => g.map(v => v * s));
+  const crosses = bx => {
+    let n = 0;
+    for (const [x1, y1, x2, y2] of S) {
+      if (Math.max(x1, x2) < bx[0] || Math.min(x1, x2) > bx[2] || Math.max(y1, y2) < bx[1] || Math.min(y1, y2) > bx[3]) continue;
+      // clip the segment to the box (Liang-Barsky)
+      let t0 = 0, t1 = 1; const dx = x2 - x1, dy = y2 - y1; let hit = true;
+      for (const [p, q] of [[-dx, x1 - bx[0]], [dx, bx[2] - x1], [-dy, y1 - bx[1]], [dy, bx[3] - y1]]) {
+        if (p === 0) { if (q < 0) { hit = false; break; } continue; }
+        const t = q / p; if (p < 0) { if (t > t1) { hit = false; break; } if (t > t0) t0 = t; } else { if (t < t0) { hit = false; break; } if (t < t1) t1 = t; }
+      }
+      if (hit) n++;
+    }
+    return n;
+  };
+
+  const rank = L => (L.r.id === selected && !L.away ? 9 : 0) + (matches.has(L.r.id) && !L.away ? 5 : 0) + L.prio;
+  const order = [...labels].sort((a, b) => rank(b) - rank(a));
+  for (const L of order) {
+    let cands;
+    if (L.away) {
+      const st = stubs.find(o => o.r === L.r && o.v === L.v);
+      const x = st.x2 * s + L.v[0] * 4, y = st.y2 * s + L.v[1] * 4;
+      const left = L.v[0] > 0.1 ? x : L.v[0] < -0.1 ? x - L.w : x - L.w / 2;
+      const top = L.v[1] > 0.1 ? y : L.v[1] < -0.1 ? y - L.h : y - L.h / 2;
+      cands = [[left, top]];
+    } else {
+      const x = L.r.x * s, y = L.r.y * s, g = DOT + 3;
+      cands = [[x - L.w / 2, y + g], [x - L.w / 2, y - g - L.h], [x + g, y - L.h / 2], [x - g - L.w, y - L.h / 2]];
+    }
+    let ok = null, best = Infinity;
+    for (const [lx, ly] of cands) {
+      const bx = [lx, ly, lx + L.w, ly + L.h];
+      if (!free(bx, dotBox.get(L.r))) continue;
+      const c = (clipped(bx) ? 1000 : 0) + (L.away ? 0 : crosses([bx[0] + 2, bx[1] + 2, bx[2] - 2, bx[3] - 2]));
+      if (c < best) { best = c; ok = bx; if (!c) break; }
+    }
+    if (best >= 1000) ok = null; // only cut off wherever it goes: wait until panned into view
+    const forced = !ok && L.r.id === selected && !L.away;
+    if (!ok && forced) ok = [cands[0][0], cands[0][1], cands[0][0] + L.w, cands[0][1] + L.h];
+    if (!ok) {
+      // Hidden until there is room; hovering the room still shows it, below its dot
+      const [lx, ly] = cands[0];
+      L.el.classList.add("off");
+      L.el.setAttribute("font-size", L.size * k); L.el.setAttribute("x", lx * k); L.el.setAttribute("y", (ly + L.asc) * k);
+      continue;
+    }
+    add(ok);
+    L.el.classList.remove("off");
+    L.el.setAttribute("font-size", L.size * k);
+    L.el.setAttribute("x", ok[0] * k); L.el.setAttribute("y", (ok[1] + L.asc) * k);
+    L.el.setAttribute("stroke-width", 5 * k);
+  }
+  for (const L of labels) if (L.el.classList.contains("off")) L.el.setAttribute("stroke-width", 5 * k);
+}
+let placeTimer = 0;
+const apply = () => {
+  vp.setAttribute("transform", `translate(${view.x} ${view.y}) scale(${view.s})`);
+  clearTimeout(placeTimer); placeTimer = setTimeout(place, view.s !== apply.lastS ? 40 : 120); apply.lastS = view.s;
+};
+
+function bounds() {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const r of ROOMS) { x0 = Math.min(x0, r.x); y0 = Math.min(y0, r.y); x1 = Math.max(x1, r.x); y1 = Math.max(y1, r.y); }
+  return { x0: x0 - 60, y0: y0 - 24, x1: x1 + 60, y1: y1 + 24 };
+}
+function fit() {
+  const b = bounds(), w = wrap.clientWidth, h = wrap.clientHeight;
+  view.s = Math.min(w / (b.x1 - b.x0), h / (b.y1 - b.y0));
+  view.x = (w - (b.x1 - b.x0) * view.s) / 2 - b.x0 * view.s;
+  view.y = (h - (b.y1 - b.y0) * view.s) / 2 - b.y0 * view.s;
+  apply();
+}
+function zoomAt(f, cx, cy) {
+  const ns = Math.max(0.3, Math.min(MAXZ, view.s * f)); f = ns / view.s;
+  view.x = cx - (cx - view.x) * f; view.y = cy - (cy - view.y) * f; view.s = ns; apply();
+}
+function centreOn(r, s) {
+  view.s = Math.min(MAXZ, Math.max(view.s, s || 3));
+  view.x = wrap.clientWidth / 2 - r.x * view.s; view.y = wrap.clientHeight / 2 - r.y * view.s; apply();
+}
+wrap.addEventListener("wheel", ev => {
+  ev.preventDefault(); const b = wrap.getBoundingClientRect();
+  zoomAt(Math.exp(-ev.deltaY * 0.0015), ev.clientX - b.left, ev.clientY - b.top);
+}, { passive: false });
+const pts = new Map(); let last = null, pinch = null, moved = 0;
+wrap.addEventListener("pointerdown", ev => {
+  if (ev.target.closest("button")) return;
+  // No pointer capture yet: it would send the click to the map instead of the room
+  pts.set(ev.pointerId, [ev.clientX, ev.clientY]); moved = 0;
+  if (pts.size === 1) { last = [ev.clientX, ev.clientY]; wrap.classList.add("drag"); }
+  if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = Math.hypot(a[0] - b[0], a[1] - b[1]); }
+});
+wrap.addEventListener("pointermove", ev => {
+  if (!pts.has(ev.pointerId)) return;
+  pts.set(ev.pointerId, [ev.clientX, ev.clientY]);
+  if (pts.size === 2 && pinch) {
+    const [a, b] = [...pts.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]), r = wrap.getBoundingClientRect();
+    zoomAt(d / pinch, (a[0] + b[0]) / 2 - r.left, (a[1] + b[1]) / 2 - r.top); pinch = d; moved += 10;
+  } else if (last) {
+    view.x += ev.clientX - last[0]; view.y += ev.clientY - last[1]; moved += Math.abs(ev.clientX - last[0]) + Math.abs(ev.clientY - last[1]);
+    last = [ev.clientX, ev.clientY]; apply();
+  }
+  if (moved > 4 && !wrap.hasPointerCapture(ev.pointerId)) wrap.setPointerCapture(ev.pointerId);
+});
+const up = ev => { pts.delete(ev.pointerId); if (pts.size < 2) pinch = null; if (!pts.size) { last = null; wrap.classList.remove("drag"); } };
+wrap.addEventListener("pointerup", up); wrap.addEventListener("pointercancel", up);
+wrap.addEventListener("click", ev => { if (moved > 4) ev.stopPropagation(); }, true);
+document.getElementById("zin").onclick = () => zoomAt(1.5, wrap.clientWidth / 2, wrap.clientHeight / 2);
+document.getElementById("zout").onclick = () => zoomAt(1 / 1.5, wrap.clientWidth / 2, wrap.clientHeight / 2);
+document.getElementById("fit").onclick = fit;
+
+
+// Selection and the room panel
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+function select(id, centre) {
+  const r = byId.get(id); if (!r) return;
+  if (selected) gById.get(selected).classList.remove("sel");
+  selected = id; const g = gById.get(id); g.classList.add("sel"); nodesG.appendChild(g);
+  if (centre) centreOn(r);
+  place();
+  const order = "nsewud";
+  const exits = [...r.e].sort((a, b) => order.indexOf(a.d) - order.indexOf(b.d)).map(e => {
+    const inCity = e.z === "home", t = inCity && byId.get(e.to);
+    const oneway = inCity && t && !t.e.some(b => b.z === "home" && b.to === r.id);
+    const name = inCity ? `<button type="button" data-go="${esc(e.to)}">${esc(t ? t.t : e.to)}</button>` : `<span class="id">${esc(e.to)}@${esc(e.z)}</span>`;
+    return `<li><span class="dir">${DNAME[e.d]}</span><span>${name}${e.door ? '<span class="tag door">door</span>' : ""}${!inCity ? '<span class="tag away">' + esc(e.z) + "</span>" : ""}${oneway ? '<span class="tag oneway">one way</span>' : ""}</span></li>`;
+  }).join("");
+  const sect = { city: "Street", inside: "Indoors", field: "Field", hills: "Hills", water_swim: "Water" }[r.s] || r.s;
+  document.getElementById("detail").innerHTML =
+    `<div class="eyebrow">${esc(sect)}${r.placed ? " · position estimated" : ""}</div><h2>${esc(r.t)}</h2>` +
+    `<div class="id">${esc(r.id)}</div>` +
+    `<div><div class="eyebrow" style="margin:12px 0 6px">Exits</div>${exits ? `<ul class="exits">${exits}</ul>` : '<p class="hint">No exits.</p>'}</div>`;
+  document.querySelectorAll("#detail [data-go]").forEach(b => b.onclick = () => select(b.dataset.go, true));
+}
+
+// Search
+const q = document.getElementById("q"), results = document.getElementById("results");
+q.addEventListener("input", () => {
+  const s = q.value.trim().toLowerCase();
+  gById.forEach(g => g.classList.remove("match"));
+  matches = new Set();
+  if (!s) { results.hidden = true; place(); return; }
+  const hits = ROOMS.filter(r => r.t.toLowerCase().includes(s) || r.id.includes(s));
+  hits.forEach(r => { gById.get(r.id).classList.add("match"); matches.add(r.id); });
+  place();
+  results.hidden = false;
+  results.innerHTML = `<div class="eyebrow">${hits.length} match${hits.length === 1 ? "" : "es"}</div>` +
+    hits.slice(0, 40).map(r => `<button type="button" data-go="${esc(r.id)}">${esc(r.t)} <span class="id">${esc(r.id)}</span></button>`).join("");
+  results.querySelectorAll("[data-go]").forEach(b => b.onclick = () => select(b.dataset.go, true));
+});
+q.addEventListener("keydown", ev => { if (ev.key === "Enter") { const b = results.querySelector("[data-go]"); b && b.click(); } });
+
+new ResizeObserver(() => { if (!selected) fit(); }).observe(wrap);
+fit();
+const start = byId.get("cth_square1");
+if (start) select(start.id, false);
+place();
+// The web fonts can arrive after the first measurement and change the widths
+if (document.fonts) document.fonts.ready.then(() => { measure(); place(); });
+</script>

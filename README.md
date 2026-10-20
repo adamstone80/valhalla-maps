@@ -2,6 +2,12 @@
 
 Interactive maps of [DikuMUD III](https://github.com/Seifert69/DikuMUD3) (Valhalla MUD) and [DikuMUD II](https://github.com/Seifert69/DikuMUD2).
 
+## Xiyang room map
+
+**Open it:** https://adamstone80.github.io/midgaard-map/xiyang.html
+
+Every room of Xiyang, its harbour and the lands outside, from DikuMUD II's `xiyang`, `xiyang2` and `oxiyang` zones (DikuMUD III's public source doesn't include them). These zones have no map positions, so rooms are laid out from their exits. Built by `xiyang/build_xiyang.py`.
+
 ## World map: every zone and how they connect
 
 **Open it:** https://adamstone80.github.io/midgaard-map/world.html
