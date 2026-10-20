@@ -82,6 +82,48 @@ for root in order:
             queue.append(to)
     off = max(c[0] for c in taken) + 3
 
+# The zones' own geometry is not consistent (a loop of streets need not close), so the first
+# placement leaves some exits pointing the wrong way. Relax: pull every exit towards its
+# direction, push rooms that crowd each other apart, and repeat.
+keys = list(rooms)
+edges = [(k, e["to"], DV[e["d"]]) for k in keys for e in rooms[k]["e"] if e["z"] == "home"]
+MIN = STEP * 0.8
+for it in range(500):
+    f = {k: [0.0, 0.0] for k in keys}
+    for a, b, v in edges:
+        ra, rb = rooms[a], rooms[b]
+        ex = (rb["x"] - ra["x"]) - v[0] * STEP
+        ey = (rb["y"] - ra["y"]) - v[1] * STEP
+        f[a][0] += ex * 0.25; f[a][1] += ey * 0.25
+        f[b][0] -= ex * 0.25; f[b][1] -= ey * 0.25
+    cells = {}
+    for k in keys:
+        cells.setdefault((int(rooms[k]["x"] // MIN), int(rooms[k]["y"] // MIN)), []).append(k)
+    for (cx, cy), ks in cells.items():
+        near = [o for dx in (-1, 0, 1) for dy in (-1, 0, 1) for o in cells.get((cx + dx, cy + dy), [])]
+        for a in ks:
+            for b in near:
+                if a == b: continue
+                dx, dy = rooms[a]["x"] - rooms[b]["x"], rooms[a]["y"] - rooms[b]["y"]
+                d = (dx * dx + dy * dy) ** 0.5
+                if d < MIN:
+                    if d < 0.01: dx, dy, d = 1.0, 0.0, 1.0
+                    push = (MIN - d) * 0.3
+                    f[a][0] += dx / d * push; f[a][1] += dy / d * push
+    for k in keys:
+        rooms[k]["x"] += f[k][0] * 0.5; rooms[k]["y"] += f[k][1] * 0.5
+for r in rooms.values():
+    r["x"], r["y"] = round(r["x"], 1), round(r["y"], 1)
+wrong = 0
+for a in keys:
+    for e in rooms[a]["e"]:
+        if e["z"] != "home": continue
+        v, b = DV[e["d"]], rooms[e["to"]]
+        if (b["x"] - rooms[a]["x"]) * v[0] + (b["y"] - rooms[a]["y"]) * v[1] <= 0:
+            e["odd"] = True   # a maze: the exits do not fit a flat grid, so the map cannot show it truthfully
+            wrong += 1
+print(f"{wrong} of {len(edges)} exits still drawn against their direction")
+
 out = list(rooms.values())
 page = open(os.path.join(HERE, "..", "template.html")).read()
 page = re.sub(r'\s*<image id="backdrop".*?</image>', "", page, flags=re.S)
@@ -95,6 +137,7 @@ page = re.sub(r'<p class="hint">Rooms sit at.*?</p>',
               '<p class="hint">These zones have no map positions in the game, so rooms are laid out from their exits: north is up, east is right. Where the city\'s streets bend, the picture bends too.</p>', page, flags=re.S)
 page = re.sub(r'<p class="hint">Rooms, exits and the map image.*?</p>',
               '<p class="hint">Rooms and exits come from the <a href="https://github.com/Seifert69/DikuMUD2">DikuMUD II</a> zones xiyang, xiyang2 and oxiyang (the Xiyang of Valhalla\'s source may differ). An unofficial fan map: the game itself is the final word. <a href="world.html">Every zone and how they connect →</a></p>', page, flags=re.S)
+page = page.replace("${oneway ? '<span class=\"tag oneway\">one way</span>' : \"\"}", "${oneway ? '<span class=\"tag oneway\">one way</span>' : \"\"}${e.odd ? '<span class=\"tag away\">drawn out of place: a maze</span>' : \"\"}")
 page = page.replace("__ROOMS__", json.dumps(out, separators=(",", ":")))
 open(os.path.join(HERE, "..", "xiyang.html"), "w").write(page)
 print(f"xiyang.html: {len(out)} rooms, {sum(len(r['e']) for r in out)} exits, "
