@@ -11,20 +11,23 @@ import json, os, re, sys
 
 D = sys.argv[1] if len(sys.argv) > 1 else os.path.expanduser("~/DikuMUD2/dm-dist-ii")
 HERE = os.path.dirname(os.path.abspath(__file__))
-ZONES = ["xiyang", "xiyang2", "oxiyang"]
+ZONES = ["xiyang", "xiyang2", "outxiyang"]   # zone names; the last one lives in oxiyang.zon
+FILES = {"outxiyang": "oxiyang"}
 STEP = 26
 DV = {"n": (0, -1), "s": (0, 1), "e": (1, 0), "w": (-1, 0), "u": (0.5, -0.5), "d": (-0.5, 0.5)}
 REV = {"n": "s", "s": "n", "e": "w", "w": "e", "u": "d", "d": "u"}
 
 rooms = {}
 for zone in ZONES:
-    s = open(os.path.join(D, "zon", zone + ".zon"), errors="replace").read()
+    s = open(os.path.join(D, "zon", FILES.get(zone, zone) + ".zon"), errors="replace").read()
     s = re.sub(r"/\*.*?\*/", "", s, flags=re.S)
     s = re.sub(r"//[^\n]*", "", s)
     s = re.sub(r"%dil.*?(?=\n%)", "", s, flags=re.S)
     r = s[s.index("%rooms"):]
     r = r[:re.search(r"\n%(objects|mobiles|reset|end)", r).start()]
     for name, body in re.findall(r"\n[ \t]*([a-z_0-9]+)[ \t]*\n(.*?)\nend\b", r, flags=re.S):
+        if not re.search(r"\bmovement\s+SECT_", body):
+            continue   # a monster defined among the rooms
         title = re.search(r'\btitle\s+"([^"]*)"', body)
         sect = re.search(r"movement\s+SECT_(\w+)", body)
         bare = re.sub(r'"(?:[^"\\]|\\.)*"', '""', body)
@@ -136,7 +139,7 @@ page = page.replace("e.g. temple", "e.g. harbor")
 page = re.sub(r'<p class="hint">Rooms sit at.*?</p>',
               '<p class="hint">These zones have no map positions in the game, so rooms are laid out from their exits: north is up, east is right. Where the city\'s streets bend, the picture bends too.</p>', page, flags=re.S)
 page = re.sub(r'<p class="hint">Rooms, exits and the map image.*?</p>',
-              '<p class="hint">Rooms and exits come from the <a href="https://github.com/Seifert69/DikuMUD2">DikuMUD II</a> zones xiyang, xiyang2 and oxiyang (the Xiyang of Valhalla\'s source may differ). An unofficial fan map: the game itself is the final word. <a href="world.html">Every zone and how they connect →</a></p>', page, flags=re.S)
+              '<p class="hint">Rooms and exits come from the <a href="https://github.com/Seifert69/DikuMUD2">DikuMUD II</a> zones xiyang, xiyang2 and outxiyang (the Xiyang of Valhalla\'s source may differ). An unofficial fan map: the game itself is the final word. <a href="world.html">Every zone and how they connect →</a></p>', page, flags=re.S)
 page = page.replace("${oneway ? '<span class=\"tag oneway\">one way</span>' : \"\"}", "${oneway ? '<span class=\"tag oneway\">one way</span>' : \"\"}${e.odd ? '<span class=\"tag away\">drawn out of place: a maze</span>' : \"\"}")
 page = page.replace("__ROOMS__", json.dumps(out, separators=(",", ":")))
 open(os.path.join(HERE, "..", "xiyang.html"), "w").write(page)
