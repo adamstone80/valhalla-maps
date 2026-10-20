@@ -14,7 +14,7 @@ Interactive maps of [DikuMUD III](https://github.com/Seifert69/DikuMUD3) (Valhal
 
 **Open it:** https://adamstone80.github.io/valhalla-maps/xiyang/
 
-Every room of Xiyang, its harbour and the lands outside, from DikuMUD II's `xiyang`, `xiyang2` and `oxiyang` zones (DikuMUD III's public source doesn't include them). These zones have no map positions, so rooms are laid out from their exits. Built by `build_xiyang.py`.
+Every room of Xiyang, its harbour and the lands outside, from DikuMUD II's `xiyang`, `xiyang2` and `oxiyang` zones (DikuMUD III's public source doesn't include them). These zones have no map positions, so rooms are laid out from their exits. Built by `python3 build_xiyang.py PATH/TO/DikuMUD3 PATH/TO/DikuMUD2`, which reads the zones with `world.py`'s parser (through DikuMUD III's preprocessor), so both maps read them the same way. Rooms sit on a grid; exits normally span two cells, lines never pass through a room that is not one of their ends, and where the zones' own exits contradict each other (the outer plains and desert are mazes) the exit is tagged in the room's exit list.
 
 ## World map: every zone and how they connect
 
