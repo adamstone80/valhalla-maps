@@ -1,16 +1,24 @@
 # Valhalla maps
 
+**All maps:** https://adamstone80.github.io/valhalla-maps/
+
+| Map | Address | Built by |
+|---|---|---|
+| World (every zone) | `/world/` | `world.py` |
+| Midgaard (rooms) | `/midgaard/` | `build.py` |
+| Xiyang (rooms) | `/xiyang/` | `build_xiyang.py` |
+
 Interactive maps of [DikuMUD III](https://github.com/Seifert69/DikuMUD3) (Valhalla MUD) and [DikuMUD II](https://github.com/Seifert69/DikuMUD2).
 
 ## Xiyang room map
 
-**Open it:** https://adamstone80.github.io/midgaard-map/xiyang.html
+**Open it:** https://adamstone80.github.io/valhalla-maps/xiyang/
 
-Every room of Xiyang, its harbour and the lands outside, from DikuMUD II's `xiyang`, `xiyang2` and `oxiyang` zones (DikuMUD III's public source doesn't include them). These zones have no map positions, so rooms are laid out from their exits. Built by `xiyang/build_xiyang.py`.
+Every room of Xiyang, its harbour and the lands outside, from DikuMUD II's `xiyang`, `xiyang2` and `oxiyang` zones (DikuMUD III's public source doesn't include them). These zones have no map positions, so rooms are laid out from their exits. Built by `build_xiyang.py`.
 
 ## World map: every zone and how they connect
 
-**Open it:** https://adamstone80.github.io/midgaard-map/world.html
+**Open it:** https://adamstone80.github.io/valhalla-maps/world/
 
 - One box per zone, its area growing with its number of rooms, coloured by how dangerous its weakest monsters are: novices (1–10), some experience (11–25), seasoned (26–40), the mightiest (41+). The colour key stays in the map's corner.
 - Zones are grouped into regions (Midgaard, Udgaard & Cypress, Haon-Dor, Ratswarf & Torsbay, Hades and others), each drawn as one area and laid out on its own, so the map reads as neighbourhoods. The list is `REGIONS` in `world.py`; a zone not in it joins the region it has most exits to.
@@ -49,7 +57,7 @@ Limits:
 
 ## Midgaard room by room
 
-**Open it:** https://adamstone80.github.io/midgaard-map/
+**Open it:** https://adamstone80.github.io/valhalla-maps/midgaard/
 
 - All 205 rooms of Midgaard, with their names, every exit, doors, up/down links and the roads out to other zones.
 - Drag to move, scroll or pinch to zoom; names that don't fit appear as you zoom in.
@@ -61,8 +69,8 @@ Rooms are placed at the positions the game uses for its web client's map (`gmap(
 ## Rebuilding
 
 ```
-python3 build.py PATH/TO/DikuMUD3                   # index.html from template.html
-python3 world.py PATH/TO/DikuMUD3 PATH/TO/DikuMUD2  # world.html from world-template.html
+python3 build.py PATH/TO/DikuMUD3                   # midgaard/index.html from template.html
+python3 world.py PATH/TO/DikuMUD3 PATH/TO/DikuMUD2  # world/index.html from world-template.html
 ```
 
 To write introductions for new or changed zones (a zone is written again only when its source changes):
@@ -78,10 +86,10 @@ python3 world.py PATH/TO/DikuMUD3 PATH/TO/DikuMUD2 --drafts           # local pr
 `world.py` needs a built DikuMUD3 (it runs the zone preprocessor `vme/bin/pp`). It reads every zone in each game's zone list. To check the teleport points again, run a DikuMUD3 server with an immortal and use:
 
 ```
-python3 tools/verify_teleports.py world.html PORT NAME PASSWORD > tools/verified-d3.json
+python3 tools/verify_teleports.py world/index.html PORT NAME PASSWORD > tools/verified-d3.json
 ```
 
-Then rebuild `world.html`.
+Then rebuild `world/index.html`.
 
 ## Licence
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Build xiyang.html, a room map of Xiyang, from a DikuMUD II checkout.
+"""Build xiyang/index.html, a room map of Xiyang, from a DikuMUD II checkout.
 
-  python3 xiyang/build_xiyang.py PATH/TO/DikuMUD2/dm-dist-ii
+  python3 build_xiyang.py PATH/TO/DikuMUD2/dm-dist-ii
 
 Reads zon/xiyang.zon (the city), zon/xiyang2.zon (harbour and palace extension) and
 zon/oxiyang.zon (the lands outside), lays the rooms out from their exits (these zones
@@ -179,7 +179,7 @@ skew = sum(1 for a, b, _ in edges if rooms[a]["x"] != rooms[b]["x"] and rooms[a]
 print(f"{wrong} of {len(edges)} exits drawn against their direction; {skew} drawn with a bend")
 
 out = list(rooms.values())
-page = open(os.path.join(HERE, "..", "template.html")).read()
+page = open(os.path.join(HERE, "template.html")).read()
 page = re.sub(r'\s*<image id="backdrop".*?</image>', "", page, flags=re.S)
 page = re.sub(r'\s*<label class="tog">.*?</label>', "", page, flags=re.S)
 page = page.replace('document.getElementById("img").onchange = ev => wrap.classList.toggle("showimg", ev.target.checked);', "")
@@ -190,8 +190,9 @@ page = page.replace("e.g. temple", "e.g. harbor")
 page = re.sub(r'<p class="hint">Rooms sit at.*?</p>',
               '<p class="hint">These zones have no map positions in the game, so rooms are laid out on a grid from their exits: north is up, east is right. Where the zone\'s streets don\'t fit a grid, a line takes a right-angle bend.</p>', page, flags=re.S)
 page = re.sub(r'<p class="hint">Rooms, exits and the map image.*?</p>',
-              '<p class="hint">Rooms and exits come from the <a href="https://github.com/Seifert69/DikuMUD2">DikuMUD II</a> zones xiyang, xiyang2 and outxiyang (the Xiyang of Valhalla\'s source may differ). An unofficial fan map: the game itself is the final word. <a href="world.html">Every zone and how they connect →</a></p>', page, flags=re.S)
+              '<p class="hint">Rooms and exits come from the <a href="https://github.com/Seifert69/DikuMUD2">DikuMUD II</a> zones xiyang, xiyang2 and outxiyang (the Xiyang of Valhalla\'s source may differ). An unofficial fan map: the game itself is the final word. <a href="../world/">Every zone and how they connect →</a> <a href="../midgaard/">Midgaard room by room →</a> <a href="../">All Valhalla maps</a></p>', page, flags=re.S)
 page = page.replace("${oneway ? '<span class=\"tag oneway\">one way</span>' : \"\"}", "${oneway ? '<span class=\"tag oneway\">one way</span>' : \"\"}${e.odd ? '<span class=\"tag away\">drawn out of place: a maze</span>' : \"\"}")
+page = page.replace('<a href="../xiyang/">Xiyang room by room →</a> ', "")
 page = page.replace("const p = pairs.get(k) || { a: r.id, b: e.to, vert: false, door: false };", "const p = pairs.get(k) || { a: r.id, b: e.to, d: e.d, vert: false, door: false };")
 old_edge = re.search(r"for \(const p of pairs.values\(\)\) \{.*?\n\}\n", page, flags=re.S).group(0)
 new_edge = """for (const p of pairs.values()) {
@@ -213,6 +214,6 @@ new_edge = """for (const p of pairs.values()) {
 """
 page = page.replace(old_edge, new_edge)
 page = page.replace("__ROOMS__", json.dumps(out, separators=(",", ":")))
-open(os.path.join(HERE, "..", "xiyang.html"), "w").write(page)
-print(f"xiyang.html: {len(out)} rooms, {sum(len(r['e']) for r in out)} exits, "
+open(os.path.join(HERE, "xiyang", "index.html"), "w").write(page)
+print(f"xiyang/index.html: {len(out)} rooms, {sum(len(r['e']) for r in out)} exits, "
       f"{sum(1 for r in out for e in r['e'] if e['z'] != 'home')} leave the region")

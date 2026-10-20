@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check world.html's DikuMUD III teleport points in a running game.
+"""Check world/index.html's DikuMUD III teleport points in a running game.
 
   verify_teleports.py WORLD_HTML PORT CHARACTER PASSWORD > verified.json
 

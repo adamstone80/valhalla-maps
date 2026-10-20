@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build index.html, the Midgaard room map, from a DikuMUD3 checkout.
+"""Build midgaard/index.html, the Midgaard room map, from a DikuMUD3 checkout.
 
   python3 build.py PATH/TO/DikuMUD3
 
@@ -49,5 +49,5 @@ assert not missing, missing
 img = base64.b64encode(open(os.path.join(D, "vme/www/img/midgaard.jpg"), "rb").read()).decode()
 page = open(os.path.join(HERE, "template.html")).read()
 page = page.replace("__ROOMS__", json.dumps(rooms, separators=(",", ":"))).replace("__MAP__", img)
-open(os.path.join(HERE, "index.html"), "w").write(page)
-print(f"index.html: {len(rooms)} rooms, {sum(len(x['e']) for x in rooms)} exits")
+open(os.path.join(HERE, "midgaard", "index.html"), "w").write(page)
+print(f"midgaard/index.html: {len(rooms)} rooms, {sum(len(x['e']) for x in rooms)} exits")

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build world.html, the zone map of DikuMUD II and DikuMUD III, from both checkouts.
+"""Build world/index.html, the zone map of DikuMUD II and DikuMUD III, from both checkouts.
 
   python3 world.py PATH/TO/DikuMUD3 PATH/TO/DikuMUD2
 
@@ -808,8 +808,8 @@ def main():
                 counts={g: dict(zones=len(games[g]["zones"]), listed=len(games[g]["listed"])) for g in games})
     page = open(os.path.join(HERE, "world-template.html")).read()
     page = page.replace("__DATA__", json.dumps(data, separators=(",", ":"), ensure_ascii=False).replace("</", "<\\/"))
-    open(os.path.join(HERE, "world.html"), "w").write(page)
-    print(f"world.html written ({len(page) // 1024} KB)", file=sys.stderr)
+    open(os.path.join(HERE, "world", "index.html"), "w").write(page)
+    print(f"world/index.html written ({len(page) // 1024} KB)", file=sys.stderr)
 
 
 if __name__ == "__main__":

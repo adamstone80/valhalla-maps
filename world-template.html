@@ -288,7 +288,7 @@ document.getElementById("about").innerHTML =
   `Built on ${esc(DATA.built)} from the public sources of <a href="https://github.com/Seifert69/DikuMUD3">DikuMUD III</a> ` +
   `and <a href="https://github.com/Seifert69/DikuMUD2">DikuMUD II</a> (LGPL-2.1), which Valhalla grew from. Valhalla also runs ` +
   `zones whose source isn't public, so the game has more than this map. Only exits are drawn: ships, portals and other ` +
-  `moves made by scripts are not. An unofficial fan map: the game is the final word. <a href="./">Midgaard room by room →</a>`;
+  `moves made by scripts are not. An unofficial fan map: the game is the final word. <a href="../midgaard/">Midgaard room by room →</a> <a href="../xiyang/">Xiyang room by room →</a> <a href="../">All Valhalla maps</a>`;
 
 // The zone shown for a node: DikuMUD III's version when it has one
 const main = n => Z[n.m.find(k => k.startsWith("d3:")) || n.m[0]];
@@ -408,7 +408,7 @@ function build() {
     t.textContent = "No exits to other zones in the source: reached by scripts, teleport, or not at all";
   }
   const nz = V.nodes.length, ne = V.edges.length;
-  document.getElementById("meta").innerHTML = `${nz} zones · ${ne} exits between zones · <a href="./">Midgaard rooms</a>`;
+  document.getElementById("meta").innerHTML = `${nz} zones · ${ne} exits between zones · <a href="../midgaard/">Midgaard rooms</a> · <a href="../xiyang/">Xiyang rooms</a> · <a href="../">All maps</a>`;
   applyLevel();
 }
 
